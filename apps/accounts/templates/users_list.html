@@ -1,0 +1,309 @@
+{% extends "body.html" %}
+
+{% block content %}
+<div class="w-full bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom overflow-hidden">
+
+    <!-- Header -->
+    <div class="flex flex-row items-center justify-between px-6 py-7 gap-5">
+
+        <div class="flex flex-row items-center gap-5">
+
+            <div class="bg-blue-600 p-3 rounded-full text-white">
+                {% include 'icons/user.html' %}
+            </div>
+
+            <div>
+                <h2 class="text-xl font-semibold">
+                    Gestión de Usuarios
+                </h2>
+
+                <p class="text-xs text-gray-500 mt-1">
+                    Administra usuarios, asigna grupos, activa/inactiva, actualiza datos, crea o elimina usuarios.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="flex flex-row items-center">
+            <form method="get" class="my-2 flex flex-row items-center gap-5 px-2">
+                <div class="flex flex-row items-center p-2 gap-3 border border-[var(--border-shadow)] shadow-custom rounded-md text-gray-500">
+                    {% include "icons/search.html" %}
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Buscar por nombre, documento o email"
+                        value="{{ request.GET.search }}"
+                        class="w-[400px] bg-transparent outline-none focus:outline-none focus:ring-0 focus:border-none text-base-content text-sm font-normal"
+                    >
+                </div>
+
+                {% include 'configurator/search_button.html' %}
+
+                {% url 'create-user' as add_url %}
+                {% include 'configurator/add_button.html' with add_url=add_url message="Nuevo usuario" %}
+            </form>
+        </div>
+
+    </div>
+
+    <div class="px-10 flex flex-row gap-4 text-sm font-semibold">
+        <div class="flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
+            <div class="h-2 w-2 rounded-full bg-blue-400"></div>
+            <p class="text-[var(--blue-text)]">Todos</p>
+            <p class="text-blue-400 bg-blue-800/30 rounded-md px-2">{{ num_users }}</p>
+        </div>
+        <div class="flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
+            <div class="h-2 w-2 rounded-full bg-green-400"></div>
+            <p class="text-[var(--green-text)]">Activos</p>
+            <p class="text-green-300 bg-green-800/10 rounded-md px-2">{{ actives }}</p>
+        </div>
+        <div class="flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
+            <div class="h-2 w-2 rounded-full bg-red-400"></div>
+            <p class="text-[var(--red-text)]">Inactivos</p>
+            <p class="text-red-300 bg-red-800/10 rounded-md px-2">{{ inactives }}</p>
+        </div>
+        <div class="flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
+            <div class="h-2 w-2 rounded-full bg-orange-400"></div>
+            <p class="text-[var(--orange-text)]">Sin verificar</p>
+            <p class="text-orange-300 bg-orange-800/10 rounded-md px-2">{{ not_verificate }}</p>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto px-10 my-5">
+
+        <table class="w-full border-separate border-spacing-0 text-xs">
+
+            <!-- HEADER -->
+            <thead class="bg-base-300">
+
+                <tr class="text-left text-sm text-base-content/80">
+
+                    <th class="px-6 py-4 font-semibold">
+                        Usuario
+                    </th>
+
+                    <th class="px-6 py-4 font-semibold text-center">
+                        Nombre
+                    </th>
+
+                    <th class="px-6 py-4 font-semibold text-center">
+                        Apellido
+                    </th>
+
+                    <th class="px-6 py-4 font-semibold text-center">
+                        Correo
+                    </th>
+
+                    <th class="px-6 py-4 font-semibold text-center">
+                        Estado
+                    </th>
+
+                    <th class="px-6 py-4 font-semibold text-right">
+                        Acciones
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <!-- BODY -->
+            <tbody>
+
+                {% for user in users_list %}
+
+                    <tr
+                        class="
+                            border-t
+                            border-[var(--border-color)]
+                            hover:bg-[var(--base-hover)]
+                            transition-all
+                            duration-200
+                            {% if not user.is_active %}bg-[var(--desactivate)]{% endif %}
+                        "
+                    >
+
+                        <!-- USER -->
+                        <td class="px-6 py-4 border-t border-[var(--border-color)]">
+
+                            <div class="flex items-center gap-3">
+
+                                <!-- Avatar -->
+                                <div class="
+                                    w-10 h-10
+                                    rounded-full
+                                    bg-primary/20
+                                    text-primary
+                                    flex items-center justify-center
+                                    text-sm font-semibold
+                                ">
+                                    {{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}
+                                </div>
+
+                                <!-- Info -->
+                                <div>
+
+                                    <p class="font-medium leading-none">
+                                        {{ user.username }}
+                                    </p>
+
+                                    <p class="text-sm text-base-content/60 mt-1">
+                                        ID: {{ user.id }}
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <!-- FIRST NAME -->
+                        <td class="px-6 py-4 border-t border-[var(--border-color)] text-center">
+
+                            <span class="text-sm">
+                                {{ user.first_name }}
+                            </span>
+
+                        </td>
+
+                        <!-- LAST NAME -->
+                        <td class="px-6 py-4 border-t border-[var(--border-color)] text-center">
+
+                            <span class="text-sm">
+                                {{ user.last_name }}
+                            </span>
+
+                        </td>
+
+                        <!-- EMAIL -->
+                        <td class="px-6 py-4 border-t border-[var(--border-color)]">
+
+                            <div class="flex items-center justify-center gap-2 text-sm">
+
+                                <span class="text-primary">
+                                    {% include "icons/email.html" %}
+                                </span>
+
+                                <span>
+                                    {{ user.email }}
+                                </span>
+
+                            </div>
+
+                        </td>
+
+                        <!-- STATUS -->
+                        <td class="px-6 py-4 border-t border-[var(--border-color)] text-center">
+
+                            {% if user.status == "Activo" %}
+
+                                <span class="
+                                    inline-flex items-center gap-2
+                                    px-3 py-1
+                                    rounded-full
+                                    text-xs font-medium
+                                    bg-success/10
+                                    text-success
+                                ">
+                                    <span class="w-2 h-2 rounded-full bg-success"></span>
+                                    {{ user.status }}
+                                </span>
+
+                            {% elif user.status == "Inactivo" %}
+
+                                <span class="
+                                    inline-flex items-center gap-2
+                                    px-3 py-1
+                                    rounded-full
+                                    text-xs font-medium
+                                    bg-error/10
+                                    text-error
+                                ">
+                                    <span class="w-2 h-2 rounded-full bg-error"></span>
+                                    {{ user.status }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="
+                                    inline-flex items-center gap-2
+                                    px-3 py-1
+                                    rounded-full
+                                    text-xs font-medium
+                                    bg-warning/10
+                                    text-warning
+                                ">
+                                    <span class="w-2 h-2 rounded-full bg-warning"></span>
+                                    {{ user.status }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- ACTIONS -->
+                        <td class="flex flex-row gap-2 justify-center items-center px-6 py-4 border-t border-[var(--border-color)]">
+
+                            {% if user.is_active%}
+                                <div class="flex justify-end gap-2">
+
+                                    {% url 'edit-user' user.id as url_edit %}
+
+                                    {% include 'configurator/edit_button.html' with url=url_edit %}
+
+                                </div>
+                            {% endif %}
+                            
+                            {% if not user.is_staff %}
+                                <button class="
+                                        w-7 h-7
+                                        rounded-lg
+                                        border border-[var(--border-color)]
+                                        flex items-center justify-center
+                                        transition-all
+                                        duration-200
+                                        hover:shadow-xl
+                                        {% if not user.is_active %}bg-orange-400{% else %}bg-blue-400{% endif %}
+                                    "
+                                    title="
+                                        {% if user.is_active %}Desactivar usuario{% else %}Activar usuario{% endif %}
+                                    "
+                                    onclick="openConfirmationModal({
+                                        url: '{% url "change-status-user" user.id %}',
+                                        title: {% if user.is_active%}'Desactivar usuario'{% else%}'Activar usuario'{% endif %},
+                                        message: {% if user.is_active%}'¿Esta seguro que desea desactivar el usuario {{ user.username }}?'{% else%}'¿Esta seguro de activar al usuario? {{ user.username }}'{% endif %},
+                                        buttonText: 'Confirmar'
+                                    })">
+                                        {% include "icons/power.html" %}
+                                </button>
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="6"
+                            class="py-16 text-center text-base-content/60"
+                        >
+                            No hay usuarios registrados.
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% include 'configurator/paginator.html' %}
+
+    </div>
+
+</div>
+{% endblock content %}

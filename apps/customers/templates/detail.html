@@ -1,0 +1,365 @@
+{% extends "body.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="w-full bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom overflow-hidden">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center px-6 py-7">
+
+        <div class="flex items-center gap-5">
+
+            <div class="bg-primary p-3 rounded-full text-white">
+                {% include "icons/customers.html" %}
+            </div>
+
+            <div>
+
+                <h1 class="text-2xl font-semibold">
+                    {{ customer.first_name }}
+                    {{ customer.last_name }}
+                </h1>
+
+                <div class="flex items-center gap-4 mt-2 text-sm text-base-content/60">
+
+                    <span>
+                        CC. {{ customer.document }}
+                    </span>
+
+                    <span>
+                        {{ customer.city }}
+                    </span>
+
+                    <span class="
+                        inline-flex items-center gap-2
+                        px-3 py-1
+                        rounded-full
+                        bg-{{ customer.status_color }}/10
+                        text-{{ customer.status_color }}
+                    ">
+
+                        <span class="w-2 h-2 rounded-full bg-{{ customer.status_color }}"></span>
+
+                        {{ customer.status_label }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <button
+            class="btn btn-outline btn-primary"
+            onclick="history_modal.showModal()"
+        >
+            Ver historial de envíos
+        </button>
+
+        <button
+            class="btn btn-outline btn-primary"
+            onclick="customer_modal.showModal()"
+        >
+            Ver historial del asociado
+        </button>
+
+        {% url "customers" as customer_url %}
+        {% include "configurator/back_button.html" with url=customer_url %}
+
+    </div>
+
+
+    <!-- Información -->
+    <div class="px-6 pb-6">
+
+        <div class="bg-base-100 rounded-xl border border-[var(--border-shadow)] p-6">
+
+            <h2 class="font-semibold text-lg mb-6">
+                Información general
+            </h2>
+
+
+
+            <div class="grid grid-cols-2 md:grid-cols-3">
+
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="text-primary">
+                        {% include "icons/email.html" %}
+                    </span>
+
+                    <div>
+                        <p class="text-xs text-base-content/60">
+                            Correo electrónico
+                        </p>
+                        <p class="font-medium">
+                            {{ customer.email }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <span class="text-primary">
+                        {% include "icons/phone.html" %}
+                    </span>
+
+                    <div>
+                        <p class="text-xs text-base-content/60">
+                            Teléfono
+                        </p>
+                        <p class="font-medium">
+                            {{ customer.phone_num }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <span class="text-primary">
+                        {% include "icons/location.html" %}
+                    </span>
+
+                    <div>
+                        <p class="text-xs text-base-content/60">
+                            Ciudad
+                        </p>
+                        <p class="font-medium">
+                            {{ customer.city }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 mb-5">
+                    <span class="text-primary">
+                        {% include "icons/user.html" %}
+                    </span>
+
+                    <div>
+                        <p class="text-xs text-base-content/60">
+                            Género
+                        </p>
+                        <p class="font-medium">
+                            {{ customer.gender }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <span class="text-primary">
+                        {% include "icons/calendar.html" %}
+                    </span>
+
+                    <div>
+                        <p class="text-xs text-base-content/60">
+                            Edad
+                        </p>
+                        <p class="font-medium">
+                            {{ customer.age }} años
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <span class="text-primary">
+                        {% include "icons/users.html" %}
+                    </span>
+
+                    <div>
+                        <p class="text-xs text-base-content/60">
+                            Tipo de asociado
+                        </p>
+                        <p class="font-medium">
+                            {{ customer.type_customer }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 mb-5">
+                    <span class="text-primary">
+                        {% include "icons/building.html" %}
+                    </span>
+
+                    <div>
+                        <p class="text-xs text-base-content/60">
+                            Nómina
+                        </p>
+                        <p class="font-medium">
+                            {{ customer.nomina_name }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <span class="text-primary">
+                        {% include "icons/star.html" %}
+                    </span>
+
+                    <div>
+                        <p class="text-xs text-base-content/60">
+                            Score
+                        </p>
+                        <p class="font-medium">
+                            {{ customer.score }}
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- Resumen -->
+    <div class="px-6 pb-6">
+
+        <div class="grid grid-cols-4 gap-5">
+
+            <div class="bg-base-100 rounded-xl border border-[var(--border-shadow)] p-5">
+                <p class="text-sm text-base-content/60">
+                    Obligaciones
+                </p>
+
+                <p class="text-3xl font-semibold mt-2">
+                    {{ summary.total_obligations }}
+                </p>
+            </div>
+
+            <div class="bg-base-100 rounded-xl border border-[var(--border-shadow)] p-5">
+                <p class="text-sm text-base-content/60">
+                    Mayor mora
+                </p>
+
+                <p class="text-3xl font-semibold mt-2">
+                    {{ summary.max_mora }}
+                </p>
+            </div>
+
+            <div class="bg-base-100 rounded-xl border border-[var(--border-shadow)] p-5">
+                <p class="text-sm text-base-content/60">
+                    Obligaciones en mora
+                </p>
+
+                <p class="text-3xl font-semibold mt-2">
+                    {{ summary.obligations_in_mora }}
+                </p>
+            </div>
+
+            <div class="bg-base-100 rounded-xl border border-[var(--border-shadow)] p-5">
+                <p class="text-sm text-base-content/60">
+                    Saldo total
+                </p>
+
+                <p class="text-3xl font-semibold mt-2">
+                    ${{ summary.total_debt|floatformat:0 }}
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Obligaciones -->
+
+    <div class="px-6 pb-6">
+
+        <div class="bg-base-100 rounded-xl border border-[var(--border-shadow)] overflow-hidden">
+
+            <div class="px-6 py-5 border-b border-[var(--border-shadow)]">
+
+                <h2 class="font-semibold text-lg">
+                    Obligaciones
+                </h2>
+
+            </div>
+
+            <table class="w-full">
+
+                <thead class="bg-base-300">
+
+                    <tr>
+
+                        <th class="px-6 py-4 text-left">
+                            Obligación
+                        </th>
+
+                        <th class="px-6 py-4 text-left">
+                            Línea
+                        </th>
+
+                        <th class="px-6 py-4 text-center">
+                            Mora
+                        </th>
+
+                        <th class="px-6 py-4 text-right">
+                            Saldo
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for obligation in obligations %}
+
+                        <tr class="border-t border-[var(--border-shadow)]">
+
+                            <td class="px-6 py-4">
+                                {{ obligation.num_obligacion }}
+                            </td>
+
+                            <td class="px-6 py-4">
+                                {{ obligation.credit_line }}
+                            </td>
+
+                            <td class="px-6 py-4 text-center">
+
+                                {% if obligation.mora_status %}
+                                    <span class="text-warning font-semibold">
+                                        {{ obligation.mora_days }} días
+                                    </span>
+                                {% else %}
+                                    {{ obligation.mora_days }} días
+                                {% endif %}
+
+                            </td>
+
+                            <td class="px-6 py-4 text-right">
+                                ${{ obligation.total|floatformat:0 }}
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td colspan="4" class="text-center py-10 text-base-content/60">
+
+                                No existen obligaciones registradas.
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    {% include "modal_sends.html" %}
+
+    {% include "modal_customer.html" %}
+
+</div>
+
+{% endblock %}

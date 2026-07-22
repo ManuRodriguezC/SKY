@@ -1,0 +1,367 @@
+<div class="px-6 pb-6">
+
+    <div class="bg-base-100 rounded-xl border border-[var(--border-shadow)] p-6">
+
+    <div class="flex items-center justify-between mb-5">
+
+        <div>
+
+            <h2 class="font-semibold text-lg">
+                Segmentación
+            </h2>
+
+            <p class="text-sm text-base-content/60 mt-1">
+                Define qué asociados recibirán esta automatización.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div
+        class="
+            mb-5
+            rounded-xl
+            border
+            border-info/20
+            bg-info/5
+            p-4
+            text-sm
+        "
+    >
+
+        <p class="font-medium mb-2">
+            Ejemplos
+        </p>
+
+        <ul class="list-disc ml-5 space-y-1 text-base-content/70">
+
+            <li>
+                Mora entre 30 y 90 días
+            </li>
+
+            <li>
+                Edad entre 25 y 60 años
+            </li>
+
+            <li>
+                Ciudad igual a Bogotá
+            </li>
+
+            <li>
+                Género igual a F
+            </li>
+
+        </ul>
+
+    </div>
+
+    <div class="bg-base-200 rounded-xl p-5 mb-4">
+
+        <div class="grid grid-cols-12 gap-4">
+
+            <!-- Campo -->
+            <div class="col-span-12 md:col-span-3">
+
+                <label class="label">
+                    <span class="label-text">
+                        Campo
+                    </span>
+                </label>
+
+                {{ filter_form.field }}
+
+            </div>
+
+            <!-- Operador -->
+            <div class="col-span-12 md:col-span-2">
+
+                <label class="label">
+                    <span class="label-text">
+                        Operador
+                    </span>
+                </label>
+
+                {{ filter_form.operator }}
+
+            </div>
+
+            <!-- Valor -->
+            <div class="col-span-12 md:col-span-3 filter-value">
+
+                <label class="label">
+                    <span class="label-text">
+                        Valor
+                    </span>
+                </label>
+
+                {{ filter_form.value }}
+
+            </div>
+
+            <!-- Ciudades -->
+            <div class="w-[200px] filter-city hidden">
+                <label class="label w-full">
+                    <span class="label-text">
+                        Ciudad
+                    </span>
+                </label>
+
+                <select name="city" id="select-city" class="select select-bordered w-full bg-base-200">
+                    <option value="">----------</option>
+                    {% for city in citys %}
+                        <option value={{ city }}>{{ city }}</option>
+                    {% endfor %}
+                </select>
+
+            </div>
+
+            <!-- Genero -->
+            <div class="w-[200px] filter-gender hidden">
+                <label class="label w-full">
+                    <span class="label-text">
+                        Genero
+                    </span>
+                </label>
+
+                <select name="gender" id="select-gender" class="select select-bordered w-full bg-base-200">
+                    <option value="">----------</option>
+                    <option value="F">Femenino</option>
+                    <option value="M">Masculino</option>
+                </select>
+
+            </div>
+
+            <!-- Estado asociados -->
+            <div class="w-[200px] filter-status-customer hidden">
+                <label class="label w-full">
+                    <span class="label-text">
+                        Estado asociado
+                    </span>
+                </label>
+
+                <select name="status" id="select-status" class="select select-bordered w-full bg-base-200">
+                    <option value="">----------</option>
+                    {% for type in status_customers %}
+                        <option value={{ type }}>{{ type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Tipo asociados -->
+            <div class="w-[200px] filter-type-customer hidden">
+                <label class="label w-full">
+                    <span class="label-text">
+                        Tipo asociado
+                    </span>
+                </label>
+
+                <select name="type" id="select-type" class="select select-bordered w-full bg-base-200">
+                    <option value="">----------</option>
+                    {% for type in type_customers %}
+                        <option value={{ type }}>{{ type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Desde -->
+            <div class="col-span-12 md:col-span-2 filter-range-from hidden">
+
+                <label class="label">
+                    <span class="label-text">
+                        Desde
+                    </span>
+                </label>
+
+                {{ filter_form.range_from }}
+
+            </div>
+
+            <!-- Hasta -->
+            <div class="col-span-12 md:col-span-2 filter-range-to hidden">
+
+                <label class="label">
+                    <span class="label-text">
+                        Hasta
+                    </span>
+                </label>
+
+                {{ filter_form.range_to }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+    const selectOptions = ["city", "gender", "status", "type_associate"]
+
+    const operator = document.querySelector(
+        ".filter-operator"
+    );
+
+    const valueContainer = document.querySelector(
+        ".filter-value"
+    );
+
+    const rangeFromContainer = document.querySelector(
+        ".filter-range-from"
+    );
+
+    const rangeToContainer = document.querySelector(
+        ".filter-range-to"
+    );
+
+    const cityContainer = document.querySelector(
+        ".filter-city"
+    )
+
+    const typeCustomerContainer = document.querySelector(
+        ".filter-type-customer"
+    )
+
+    const genderContainer = document.querySelector(
+        ".filter-gender"
+    )
+
+    const statusCustomerContainer = document.querySelector(
+        ".filter-status-customer"
+    )
+
+    let field = document.querySelector('select[name="field"]');
+
+    function hiddenAll() {
+        valueContainer.classList.add(
+            "hidden"
+        );
+
+        rangeFromContainer.classList.add(
+            "hidden"
+        );
+
+        rangeToContainer.classList.add(
+            "hidden"
+        );
+        
+        cityContainer.classList.add(
+            "hidden"
+        )
+
+        typeCustomerContainer.classList.add(
+            "hidden"
+        )
+
+        genderContainer.classList.add(
+            "hidden"
+        )
+
+        statusCustomerContainer.classList.add(
+            "hidden"
+        )
+    }
+
+    function toggleFields() {
+        let fieldValue = field.value;
+
+        const isBetween =
+            operator.value === "between";
+
+        if (isBetween && !selectOptions.includes(fieldValue)) {
+            hiddenAll();
+            rangeFromContainer.classList.remove(
+                "hidden"
+            );
+
+            rangeToContainer.classList.remove(
+                "hidden"
+            );
+
+        } else {
+            valueContainer.classList.remove(
+                "hidden"
+            );
+            toggleChangeField()
+        }
+    }
+
+    function toggleChangeField() {
+        let fieldValue = field.value;
+
+        if (selectOptions.includes(fieldValue)) {
+            hiddenAll();
+
+            if (fieldValue === "city") {
+                cityContainer.classList.remove(
+                    "hidden"
+                )
+            } else if (fieldValue === "gender") {
+                genderContainer.classList.remove(
+                    "hidden"
+                )
+            } else if (fieldValue === "status") {
+                statusCustomerContainer.classList.remove(
+                    "hidden"
+                )
+            } else if (fieldValue === "type_associate") {
+                typeCustomerContainer.classList.remove(
+                    "hidden"
+                )
+            } 
+        } else {
+            hiddenAll();
+            valueContainer.classList.remove(
+                "hidden"
+            );
+        }
+    }
+
+    toggleFields();
+    loadSelectedValue();
+
+    operator.addEventListener(
+        "change",
+        toggleFields
+    );
+
+    field.addEventListener(
+        "change",
+        toggleChangeField
+    )
+
+    function loadSelectedValue() {
+        const fieldValue = field.value;
+        const value = document.querySelector('[name="value"]').value;
+
+        switch (fieldValue) {
+            case "city":
+                document.querySelector("#select-city").value = value;
+                break;
+
+            case "gender":
+                document.querySelector("#select-gender").value = value;
+                break;
+
+            case "status":
+                document.querySelector("#select-status").value = value;
+                break;
+
+            case "type_associate":
+                document.querySelector("#select-type").value = value;
+                break;
+        }
+    }
+
+});
+
+
+
+
+</script>

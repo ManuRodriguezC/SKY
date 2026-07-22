@@ -1,0 +1,29 @@
+{% if status == "success" %}
+
+    {% include "accounts/success.html" %}
+
+{% endif %}
+
+<!-- YA VERIFICADO -->
+
+{% if status == "verified" %}
+
+    {% include "accounts/verify.html" %}
+
+{% endif %}
+
+<!-- EXPIRADO -->
+
+{% if status == "expired" %}
+
+    {% include "accounts/expired.html" %}
+
+{% endif %}
+
+<!-- NO ENCONTRADO -->
+
+{% if status == "not_found" %}
+
+    {% include "accounts/not_found.html" %}
+
+{% endif %}

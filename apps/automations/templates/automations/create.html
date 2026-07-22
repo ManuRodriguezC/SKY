@@ -1,0 +1,360 @@
+{% extends "body.html" %}
+{% load static %}
+
+{% block content %}
+
+<form method="post" enctype="multipart/form-data" id="automation-form">
+
+{% csrf_token %}
+
+<div class="w-full bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom overflow-hidden">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between px-6 py-7">
+
+        <div class="w-full flex flex-row justify-between items-center">
+            <div class="flex items-center gap-5">
+                <div class="bg-primary p-3 rounded-full text-white">
+                    {% include 'icons/calendar.html' %}
+                </div>
+
+                <div>
+
+                    <h1 class="text-xl font-semibold">
+                        {{ title }}
+                    </h1>
+
+                    <p class="text-sm text-base-content/60 mt-1">
+                        Configura reglas automáticas para segmentar asociados y enviar comunicaciones programadas.
+                    </p>
+
+                </div>
+            </div>
+
+            {% url 'automations' as auto_url %}
+            {% include "configurator/back_button.html" with url=auto_url %}
+
+        </div>
+
+    </div>
+
+    <!-- Información -->
+    <div class="px-6 pb-6">
+
+        <div class="bg-base-100 rounded-xl border border-[var(--border-shadow)] p-6">
+
+            <h2 class="font-semibold text-lg mb-5">
+                Información general
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                <div>
+
+                    <label class="label">
+                        <span class="label-text">
+                            Nombre
+                        </span>
+                    </label>
+
+                    {{ form.name }}
+
+                </div>
+
+                <div>
+
+                    <label class="label cursor-pointer justify-start gap-4">
+
+                        <span class="label-text">
+                            Activa
+                        </span>
+
+                        {{ form.active }}
+
+                    </label>
+
+                </div>
+
+            </div>
+
+            <div class="mt-5">
+
+                <label class="label">
+                    <span class="label-text">
+                        Descripción
+                    </span>
+                </label>
+
+                {{ form.description }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Programación -->
+    <div class="px-6 pb-6">
+
+        <div class="bg-base-100 rounded-xl border border-[var(--border-shadow)] p-6">
+
+            <h2 class="font-semibold text-lg mb-5">
+                Programación
+            </h2>
+            <p>Las automatizaciones puede programarse de la siguiente forma, puede definir:</p>
+            <ul class="list-disc text-sm ml-5 text-gray-400 p-4">
+                <li>Puede definir el rango de fechas en las cuales estara vigente la automatizacion.</li>
+                <li>Definir en que semanas se ejecutara la automatizacion dentro del mes.</li>
+                <li>Definir los dias en los que se ejecutara.</li>
+                <li>Seleccionar la hora en la que se ejecutara.</li>
+                <li>Seleccionar que accion se ejecutara.</li>
+            </ul>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                <div>
+
+                    <label class="label">
+                        <span class="label-text">
+                            Fecha inicio de ejecucion
+                        </span>
+                    </label>
+
+                    {{ form.date_from }}
+
+                </div>
+
+                <div>
+
+                    <label class="label">
+                        <span class="label-text">
+                            Fecha fin de ejecucion
+                        </span>
+                    </label>
+
+                    {{ form.date_to }}
+
+                </div>
+
+            </div>
+
+            <div class="mt-6">
+
+                <label class="label">
+                    <span class="label-text">
+                        Semanas y dias de ejecucion
+                    </span>
+                </label>
+
+                <div class="bg-base-200 rounded-xl p-4 flex flex-row gap-16">
+                    <div>
+                        {{ form.weeks_of_month }}
+                    </div>
+                    <div>
+                        {{ form.days_of_week }}
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                <div>
+
+                    <label class="label">
+                        <span class="label-text">
+                            Hora de ejecución
+                        </span>
+                    </label>
+
+                    {{ form.hour }}
+
+                </div>
+
+                <div>
+
+                    <label class="label">
+                        <span class="label-text">
+                            Acción
+                        </span>
+                    </label>
+
+                    {{ form.action }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% include 'automations/filters.html' %}
+
+    <!-- Plantilla -->
+    <div class="px-6 pb-6">
+
+        <div class="bg-base-100 rounded-xl border border-[var(--border-shadow)] p-6">
+
+            <h2 class="font-semibold text-lg mb-5">
+                Plantilla del correo
+            </h2>
+
+            <div>
+                <label class="label">
+                    <span class="label-text">
+                        Formato
+                    </span>
+                </label>
+
+                {{ form.content_type }}
+            </div>
+
+            <div class="mb-5">
+
+                <label class="label">
+                    <span class="label-text">
+                        Asunto
+                    </span>
+                </label>
+
+                {{ form.subject }}
+
+            </div>
+
+            <div class="mt-5">
+
+                <div class="border border-primary/20 bg-primary/5 rounded-xl p-5">
+
+                    <h3 class="font-semibold mb-3">
+                        Ejemplo cuerpo:
+                    </h3>
+                    <p class="text-sm">Los datos validos para ingresar en la plantilla y la estructura que debe redactar es la siguiente:</p>
+                    <ul class="list-disc text-sm ml-6 p-2">
+                        <li>Nombre: {% templatetag openvariable %} nombre {% templatetag closevariable %}</li>
+                        <li>Apellido: {% templatetag openvariable %} apellido {% templatetag closevariable %}</li>
+                        <li>Obligación: {% templatetag openvariable %} obligacion {% templatetag closevariable %}</li>
+                        <li>Dias de mora: {% templatetag openvariable %} mora {% templatetag closevariable %}</li>
+                        <li>Imagen para agregar: {% templatetag openvariable %} imagen {% templatetag closevariable %}</li>
+                        <li>Ciudad: {% templatetag openvariable %} ciudad {% templatetag closevariable %}</li>
+                    </ul>
+                    <p class="my-2 text-red-400 text-xs font-bold">Importante: Los valores de obligación y dias de mora, solo son validos si selecciono el campo Días Mora.</p>
+                    <span class="text-xs">
+                        Recomendación:
+                        Utilice estilos inline (style="") para garantizar compatibilidad con Gmail y Outlook. No se recomienda usar archivos CSS externos ni JavaScript.
+                    </span>
+                    <span class="text-xs">Tenga en cuenta que si agrega imagen, debe agregarla en el siguiente paso</span>
+
+
+    <pre class="text-xs overflow-x-auto mt-4">
+        &lt;div&gt;
+
+            &lt;h2&gt;
+                Hola {% templatetag openvariable %} nombre {% templatetag closevariable %} {% templatetag openvariable %} apellido {% templatetag closevariable %}
+            &lt;/h2&gt;
+
+            &lt;p&gt;
+                La obligación
+                &lt;strong&gt;{% templatetag openvariable %} obligacion {% templatetag closevariable %}&lt;/strong&gt;
+                presenta una mora de
+                &lt;strong&gt;{% templatetag openvariable %} mora {% templatetag closevariable %} días&lt;/strong&gt;.
+            &lt;/p&gt;
+
+        &lt;/div&gt;
+    </pre>
+
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <label class="label">
+                    <span class="label-text">
+                        HTML o Texto plano
+                    </span>
+                </label>
+
+                {{ form.body }}
+
+            </div>
+
+            <div>
+
+                <label class="label">
+                    <span class="label-text">
+                        Añadir imagen
+                    </span>
+                </label>
+
+                {{ form.image }}
+
+            </div>
+
+            
+
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 py-6 border-t border-[var(--border-shadow)] bg-base-100">
+
+        <div class="flex justify-end gap-3">
+
+            <a
+                href="{% url 'automations' %}"
+                class="btn btn-ghost"
+            >
+                Cancelar
+            </a>
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Guardar automatización
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+</form>
+
+<script>
+    const formAutomation = document.getElementById("automation-form");
+
+    if (formAutomation) {
+        formAutomation.addEventListener("submit", validateForm);
+    }
+
+    function validateForm(event) {
+            const form = event.target;
+
+            const fieldName = form.querySelector('select[name="field"]');
+            const valueName = form.querySelector('[name="value"]');
+            const genderName = form.querySelector('select[name="gender"]');
+            const cityName = form.querySelector('select[name="city"]');
+            const statusName = form.querySelector('select[name="status"]');
+            const typeCustomerName = form.querySelector('select[name="type"]');
+
+            if (fieldName.value === "gender") {
+                valueName.value = genderName.value;
+            } else if (fieldName.value === "city") {
+                valueName.value = cityName.value;
+            } else if (fieldName.value === "status") {
+                valueName.value = statusName.value;
+            } else if (fieldName.value === "type_associate") {
+                valueName.value = typeCustomerName.value;
+            }
+
+            console.log(valueName.value);
+        }
+
+</script>
+
+{% endblock content %}

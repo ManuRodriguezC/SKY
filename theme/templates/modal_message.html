@@ -1,0 +1,23 @@
+<div class="toast toast-bottom toast-end z-50">
+    {% for message in messages %}
+        
+        <div 
+            class="alert 
+            {% if message.tags == 'success' %}
+                alert-success
+            {% elif message.tags == 'error' %}
+                alert-error
+            {% elif message.tags == 'warning' %}
+                alert-warning
+            {% else %}
+                alert-info
+            {% endif %}
+            shadow-lg"
+        >
+
+            <span>{{ message }}</span>
+
+        </div>
+
+    {% endfor %}
+</div>

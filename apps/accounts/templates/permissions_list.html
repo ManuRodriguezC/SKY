@@ -1,0 +1,37 @@
+{% for app, permissions in grouped_permissions.items %}
+
+    <div class="border border-base-300 rounded-xl p-4">
+
+        <h2 class="font-bold text-lg mb-3">
+            {{ app|title }}
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+
+            {% for permission in permissions %}
+
+                <label class="label cursor-pointer justify-start gap-3">
+
+                    <input
+                        type="checkbox"
+                        name="permissions"
+                        value="{{ permission.id }}"
+                        class="checkbox checkbox-primary"
+                        {% if permission in form.instance.permissions.all %}
+                            checked
+                        {% endif %}
+                    >
+
+                    <span class="label-text">
+                        {{ permission.spanish_name }}
+                    </span>
+
+                </label>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+{% endfor %}

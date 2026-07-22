@@ -1,0 +1,182 @@
+<dialog id="log_modal" class="modal">
+
+    <div
+        class="modal-box p-0 overflow-hidden"
+        style="width:1200px; max-width:1150px; height:90vh;"
+    >
+
+        <div class="flex items-center justify-between px-6 py-5 border-b border-base-300">
+
+            <div>
+
+                <h2 class="text-xl font-semibold">
+                    Historial de automatizaciones
+                </h2>
+
+                <p class="text-xs text-base-content/60 mt-1">
+                    Registro de acciones realizadas sobre las automatizaciones.
+                </p>
+
+            </div>
+
+            <form method="dialog">
+
+                <button class="btn btn-sm btn-circle btn-ghost">
+                    ✕
+                </button>
+
+            </form>
+
+        </div>
+
+        {% if logs %}
+
+            <div class="h-[calc(80vh-90px)] overflow-y-auto overflow-x-hidden p-5">
+
+                <table class="table table-sm table-pin-rows w-full">
+
+                    <thead class="bg-base-200">
+
+                        <tr>
+
+                            <th class="border-b">
+                                Automatización
+                            </th>
+
+                            <th class="border-b w-36 text-center">
+                                Acción
+                            </th>
+
+                            <th class="border-b w-36 text-center">
+                                Usuario
+                            </th>
+
+                            <th class="border-b w-40 text-center">
+                                Fecha
+                            </th>
+
+                            <th class="border-b text-center">
+                                Detalle
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for log in logs %}
+
+                            <tr class="hover border-b-1 border-gray-400">
+
+                                <td class="font-medium text-sm py-2">
+                                    {{ log.automation.name }}
+                                </td>
+
+                                <td class="py-2 text-center">
+
+                                    <span>
+                                        {{ log.get_action_display }}
+                                    </span>
+
+                                </td>
+
+                                <td class="text-sm py-2 text-center">
+
+                                    {% if log.user %}
+
+                                        {{ log.user }}
+
+                                    {% else %}
+
+                                        <span class="italic text-base-content/60 text-center">
+                                            Sistema
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td class="text-xs whitespace-nowrap py-2 text-center">
+
+                                    {{ log.created|date:"d/m/Y" }}
+
+                                    <br>
+
+                                    <span class="text-base-content/50">
+                                        {{ log.created|date:"H:i" }}
+                                    </span>
+
+                                </td>
+
+                                <td class="py-2">
+
+                                    {% if log.detail %}
+
+                                        <details class="cursor-pointer">
+
+                                            <summary
+                                                class="
+                                                    text-xs
+                                                    line-clamp-2
+                                                    text-base-content/80
+                                                "
+                                            >
+                                                {{ log.detail|truncatechars:80 }}
+                                            </summary>
+
+                                            <div
+                                                class="
+                                                    mt-2
+                                                    p-3
+                                                    rounded-lg
+                                                    bg-base-200
+                                                    text-xs
+                                                    whitespace-pre-line
+                                                    border
+                                                "
+                                            >
+                                                {{ log.detail }}
+                                            </div>
+
+                                        </details>
+
+                                    {% else %}
+
+                                        <span class="text-base-content/40">
+                                            —
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="flex justify-center items-center h-[calc(80vh-90px)] text-base-content/50">
+
+                No existen registros.
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+    <form method="dialog" class="modal-backdrop">
+        <button>
+            Cerrar
+        </button>
+    </form>
+
+</dialog>

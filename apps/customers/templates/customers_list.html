@@ -1,0 +1,263 @@
+{% extends "body.html" %}
+{% load static %}
+
+{% block content %}
+<div class="w-full bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom overflow-hidden">
+
+    <!-- Header -->
+    <div class="flex flex-row items-center justify-between px-6 py-7 gap-5">
+        <div class="flex flex-row items-center gap-5">
+            <div class="bg-blue-600 p-3 rounded-full text-white">
+                {% include 'icons/customers.html' %}
+            </div>
+            <div>
+                <h2 class="text-xl font-semibold">
+                    Asociados
+                </h2>
+
+                <p class="text-xs text-gray-500 mt-1">
+                    Gestiona y controla los asociados vinculados a la cooperativa, en ella vas a poder visualizar información de afiliación.
+                </p>
+            </div>
+        </div>
+
+        <div class="flex flex-row items-center">
+            <form id="search-form" method="get" class="my-2 flex flex-row items-center gap-5 px-2">
+                <input
+                    type="hidden"
+                    name="status"
+                    id="status-input"
+                    value="{{ request.GET.status }}"
+                >
+                <div class="flex flex-row items-center p-2 gap-3 border border-[var(--border-shadow)] shadow-custom rounded-md text-gray-500">
+                    {% include "icons/search.html" %}
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Buscar por nombre, documento o email"
+                        value="{{ request.GET.search }}"
+                        class="w-[400px] bg-transparent outline-none focus:outline-none focus:ring-0 focus:border-none text-base-content text-sm font-normal"
+                    >
+                </div>
+
+                {% include 'configurator/search_button.html' %}
+
+            </form>
+        </div>
+
+    </div>
+
+    <div class="px-10 flex flex-row gap-4 text-sm font-semibold">
+        <div data-status="todos" class="filter-card flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
+            <div class="h-2 w-2 rounded-full bg-blue-400"></div>
+            <p class="text-[var(--blue-text)]">Todos</p>
+            <p class="text-blue-400 bg-blue-800/30 rounded-md px-2">{{ num_customers }}</p>
+        </div>
+        <div data-status="active" class="filter-card flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
+            <div class="h-2 w-2 rounded-full bg-green-400"></div>
+            <p class="text-[var(--green-text)]">Activos</p>
+            <p class="text-green-300 bg-green-800/10 rounded-md px-2">{{ actives }}</p>
+        </div>
+        <div data-status="inactive" class="filter-card flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
+            <div class="h-2 w-2 rounded-full bg-red-400"></div>
+            <p class="text-[var(--red-text)]">Inactivos</p>
+            <p class="text-red-300 bg-red-800/10 rounded-md px-2">{{ inactives }}</p>
+        </div>
+        <div data-status="mora" class="filter-card flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
+            <div class="h-2 w-2 rounded-full bg-orange-400"></div>
+            <p class="text-[var(--orange-text)]">En mora</p>
+            <p class="text-orange-300 bg-orange-800/10 rounded-md px-2">{{ mora }}</p>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto px-10 my-5">
+        <table class="w-full border-separate border-spacing-0 text-xs">
+            
+            <!-- HEADER -->
+            <thead class="bg-base-300">
+                <tr class="text-left text-sm text-base-content/80">
+                    
+                    <th class="px-6 py-4 font-semibold">
+                        Asociado
+                    </th>
+
+                    <th class="px-6 py-4 font-semibold">
+                        Teléfono
+                    </th>
+
+                    <th class="px-6 py-4 font-semibold">
+                        Correo
+                    </th>
+
+                    <th class="px-6 py-4 font-semibold">
+                        Estado
+                    </th>
+
+                    <th class="px-6 py-4 text-right font-semibold">
+                        Acciones
+                    </th>
+
+                </tr>
+            </thead>
+
+            <!-- BODY -->
+            <tbody>
+
+                {% for customer in customers %}
+                    <tr
+                        class="
+                            border-t
+                            border-[var(--border-color)]
+                            hover:bg-[var(--base-hover)]
+                            transition-all
+                            duration-200
+                        "
+                    >
+
+                        <!-- CUSTOMER -->
+                        <td class="px-6 py-4 border-t border-[var(--border-color)]">
+
+                            <div class="flex items-center gap-3">
+
+                                <!-- Avatar -->
+                                <div class="
+                                    w-10 h-10 p-2
+                                    rounded-full
+                                    bg-primary/20
+                                    text-primary
+                                    flex items-center justify-center
+                                 text-sm font-semibold
+                                ">
+                                    {{ customer.first_name|slice:":2" }}
+                                </div>
+
+                                <!-- Info -->
+                                <div>
+
+                                    <p class="font-medium leading-none">
+                                        {{ customer.first_name }}
+                                    </p>
+
+                                    <p class="text-sm text-base-content/60 mt-1">
+                                        CC. {{ customer.document }}
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <!-- PHONE -->
+                        <td class="px-6 py-4 border-t border-[var(--border-color)]">
+
+                            <div class="flex items-center gap-2 text-xs">
+
+                                <span class="text-primary">
+                                    {% include "icons/phone.html" %}
+                                </span>
+
+                                <span>
+                                    {{ customer.phone_num }}
+                                </span>
+
+                            </div>
+
+                        </td>
+
+                        <!-- EMAIL -->
+                        <td class="px-6 py-4 border-t border-[var(--border-color)]">
+
+                            <div class="flex items-center gap-2 text-xs">
+
+                                <span class="text-primary">
+                                    {% include "icons/email.html" %}
+                                </span>
+
+                                <span>
+                                    {{ customer.email }}
+                                </span>
+
+                            </div>
+
+                        </td>
+
+                        <!-- STATUS -->
+                        <td class="px-6 py-4 border-t border-[var(--border-color)]">
+
+                            <span class="
+                                inline-flex items-center gap-2
+                                px-3 py-1
+                                rounded-full
+                                text-xs font-medium
+                                bg-{{ customer.status_color }}/10
+                                text-{{ customer.status_color }}
+                            ">
+                                <span class="w-2 h-2 rounded-full bg-{{ customer.status_color }}"></span>
+                                {{ customer.status_label }} {% if customer.mora_days > 0 %}{{ customer.mora_days }}{% endif %}
+                            </span>
+                        </td>
+
+                        <!-- ACTIONS -->
+                        <td class="px-6 py-4 border-t border-[var(--border-color)]">
+
+                            <div class="flex justify-end gap-2">
+
+                                <!-- VIEW -->
+                                <a
+                                    href="{% url 'customer_detail' customer.pk %}"
+                                    class="
+                                        w-9 h-9
+                                        rounded-lg
+                                        border border-[var(--border-color)]
+                                        hover:bg-[var(--base-hover)]
+                                        flex items-center justify-center
+                                        transition-all
+                                    "
+                                >
+                                    {% include "icons/eye.html" %}
+                                </a>
+
+                                <!-- EDIT -->
+                                {% comment %} <button class="
+                                    w-9 h-9
+                                    rounded-lg
+                                    border border-primary/30
+                                    text-primary
+                                    hover:bg-primary/10
+                                    flex items-center justify-center
+                                    transition-all
+                                ">
+                                    {% include "icons/edit.html" %}
+                                </button> {% endcomment %}
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td
+                            colspan="6"
+                            class="py-16 text-center text-base-content/60"
+                        >
+                            No hay asociados registrados.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% include 'configurator/paginator.html' %}
+
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,106 @@
+{% load static %}
+
+<aside
+  id="sidebar"
+  class="border-r border-[var(--border-shadow)] shadow-custom w-64 flex flex-col bg-base-100 z-10"
+>
+    <div class="flex items-center justify-between w-full p-4">
+        <div class="flex flex-row items-center gap-2">
+            <img id="image-logo" src="{% static 'img/logo.png' %}" alt="Sky App Logo" class="w-10 h-10 rounded-lg" />
+            <span class="text-lg font-bold sidebar-text">Sky App</span>
+        </div>
+
+        <button
+            onclick="toggleSidebar()"
+            class="p-2 rounded hover:bg-[var(--base-hover)] transition-all duration-200 hover:shadow-lg"
+        >
+            {% include 'icons/menu.html' %}
+        </button>
+    </div>
+
+    <nav class="w-full flex-1 px-2 space-y-2 font-semibold">
+
+        <a
+            href="{% url 'dashboard' %}"
+            class="flex items-start gap-3 px-4 py-2  hover:rounded hover:bg-[var(--base-hover)] hover:text-blue-500
+                hover:border-l-2 border-blue-600 transition-all duration-100"
+        >
+            <span class="w-5 h-5 flex">
+                {% include "icons/home.html" %}
+            </span>
+
+            <span class="sidebar-text">Dashboard</span>
+        </a>
+
+        <a
+            href="{% url 'customers' %}"
+            class="flex items-center gap-3 px-4 py-2  hover:rounded hover:bg-[var(--base-hover)] hover:text-blue-500
+                hover:border-l-2 border-blue-600 transition-all duration-100"
+        >
+            <span class="w-5 h-5 flex">
+                {% include "icons/customers.html" %}
+            </span>
+
+            <span class="sidebar-text">Asociados</span>
+        </a>
+
+        <a
+            href="{% url 'automations' %}"
+            class="flex items-center gap-3 px-4 py-2  hover:rounded hover:bg-[var(--base-hover)] hover:text-blue-500
+                hover:border-l-2 border-blue-600 transition-all duration-100"
+        >
+            <span class="w-5 h-5 flex">
+                {% include "icons/robot.html" %}
+            </span>
+
+            <span class="sidebar-text">Automatizaciones</span>
+        </a>
+
+        <div class="w-full">
+            <button
+                id="users-menu-btn"
+                type="button"
+                onclick="toggleUsersMenu()"
+                class="nav-link w-full flex items-center justify-between gap-3 px-4 py-2  hover:rounded hover:bg-[var(--base-hover)] hover:text-blue-500
+                    hover:border-l-2 border-blue-600 transition-all duration-100"
+            >
+                <div class="flex items-center gap-3">
+                    <span class="w-5 h-5 flex">
+                        {% include "icons/users.html" %}
+                    </span>
+
+                    <span class="sidebar-text">Admin. Usuarios</span>
+                </div>
+
+                {% include "icons/down_arrow.html" %}
+            </button>
+
+            <div
+                id="users-menu"
+                class="hidden flex-col gap-1 bg-base-100 hover:bg-base-100 rounded"
+            >
+                <a
+                    href="{% url 'users' %}"
+                    class="w-full flex items-center gap-3 rounded px-4 py-2 hover:bg-[var(--base-hover)]"
+                >
+                    <span class="w-5 h-5 flex">
+                        {% include "icons/admin_users.html" %}
+                    </span>
+
+                    <span class="sidebar-text">Usuarios</span>
+                </a>
+
+                <a
+                    href="{% url 'groups' %}"
+                    class="w-full flex items-center gap-3 rounded px-4 py-2 hover:bg-[var(--base-hover)]"
+                >
+                    <span class="w-5 h-5 flex">
+                        {% include "icons/groups.html" %}
+                    </span>
+                    <span class="sidebar-text">Grupos</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+</aside>
+

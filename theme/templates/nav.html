@@ -1,0 +1,68 @@
+ <nav class="bg-base-300 flex items-center justify-between px-6 py-4">
+
+    <div>
+        <h1 class="text-2xl font-bold text-[var(--title)]">{{ title_page }}</h1>
+    </div>
+
+    <div class="flex items-center gap-4">
+
+        <p>
+            {% if user.is_authenticated %}
+                {{ user.username }}
+            {% endif %}
+        </p>
+        <label class="m-1 theme-toggle border border-gray-400 rounded-full cursor-pointer">
+            <input type="checkbox" id="theme-toggle-input" />
+            <span class="slider">
+                <span class="icon sun">
+                    {% include 'icons/sun.html' %}
+                </span>
+                <span class="icon moon">
+                    {% include 'icons/moon.html' %}
+                </span>
+            </span>
+        </label>
+
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit"
+                class="p-2 rounded-full bg-base-100 hover:bg-secondary flex items-center justify-center cursor-pointer transition-all duration-200">
+                    {% include 'icons/logout.html' %}
+            </button>
+        </form>
+    </div>
+</nav>
+
+<script>
+    const html = document.documentElement;
+    const toggle = document.getElementById("theme-toggle-input");
+
+    const savedTheme = localStorage.getItem("theme");
+    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: moon)").matches;
+
+    const initialTheme = savedTheme || (systemPrefersDark ? "moon" : "sun");
+
+    html.setAttribute("data-theme", initialTheme);
+
+    if (toggle) {
+        toggle.checked = initialTheme === "moon";
+
+        toggle.addEventListener("change", () => {
+        const newTheme = toggle.checked ? "moon" : "sun";
+        html.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+        });
+    }
+
+    const toggleTheme = () => {
+        const current = html.getAttribute("data-theme");
+        const next = current === "moon" ? "sun" : "moon";
+
+        html.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+
+        if (toggle) {
+        toggle.checked = next === "moon";
+        }
+    };
+</script>

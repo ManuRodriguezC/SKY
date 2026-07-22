@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block body %}
+
+<div class="min-h-screen flex items-center justify-center bg-base-300 px-4">
+
+    <main
+        class="
+            w-full
+            max-w-md
+            bg-base-200
+            rounded-2xl
+            border
+            border-[var(--border-shadow)]
+            shadow-custom
+            p-8
+        "
+    >
+
+        <!-- Header -->
+        <div class="flex flex-col items-center mb-8">
+
+            <div class="bg-warning p-4 rounded-full text-white mb-4">
+                {% include "icons/clock.html" %}
+            </div>
+
+            <h1 class="text-2xl font-semibold">
+                Enlace expirado
+            </h1>
+
+            <p class="text-sm text-base-content/60 mt-2 text-center leading-6">
+                El enlace de verificación ya no es válido porque superó el tiempo permitido.
+            </p>
+
+        </div>
+
+        <!-- Información -->
+
+        <div class="space-y-5">
+
+            <p class="text-sm text-base-content/70 leading-6 text-center">
+
+                Por seguridad, los enlaces de verificación tienen una vigencia de
+                <strong>5 minutos</strong>.
+
+            </p>
+
+            <p class="text-sm text-base-content/70 leading-6 text-center">
+
+                Hemos enviado automáticamente un nuevo correo de verificación
+                a tu dirección de correo electrónico.
+
+            </p>
+
+            <p class="text-sm text-base-content/60 leading-6 text-center">
+
+                Si no encuentras el correo, revisa también la carpeta de
+                correo no deseado (Spam).
+
+            </p>
+
+        </div>
+
+        <div class="divider my-6"></div>
+
+        <a
+            href="{% url 'login' %}"
+            class="btn btn-primary w-full"
+        >
+            Volver al inicio de sesión
+        </a>
+
+    </main>
+
+</div>
+
+{% endblock %}

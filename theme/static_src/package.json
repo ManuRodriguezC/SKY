@@ -1,0 +1,27 @@
+{
+  "name": "theme",
+  "version": "4.4.0",
+  "description": "",
+  "scripts": {
+    "build": "npm run build:clean && npm run build:tailwind",
+    "build:clean": "rimraf ../static/css/dist",
+    "build:tailwind": "tailwindcss -i ./src/styles.css -o ../static/css/dist/styles.css --minify",
+    "dev": "tailwindcss -i ./src/styles.css -o ../static/css/dist/styles.css --config ./tailwind.config.js --watch --poll"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "autoprefixer": "^10.5.0",
+    "cross-env": "^10.1.0",
+    "postcss": "^8.5.14",
+    "postcss-cli": "^11.0.1",
+    "postcss-nested": "^7.0.2",
+    "postcss-simple-vars": "^7.0.1",
+    "rimraf": "^6.0.1",
+    "tailwindcss": "^3.4.19"
+  },
+  "dependencies": {
+    "daisyui": "^4.12.24"
+  }
+}

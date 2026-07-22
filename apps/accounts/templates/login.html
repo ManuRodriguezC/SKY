@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block body %}
+
+<div class="min-h-screen flex items-center justify-center bg-base-300 px-4">
+
+    <main
+        class="
+            w-full
+            max-w-md
+            bg-base-200
+            rounded-2xl
+            border
+            border-[var(--border-shadow)]
+            shadow-custom
+            p-8
+        "
+    >
+
+        <!-- Header -->
+        <div class="flex flex-col items-center mb-8">
+
+            <div class="bg-blue-600 p-4 rounded-full text-white mb-4">
+                {% include "icons/user.html" %}
+            </div>
+
+            <h1 class="text-2xl font-semibold">
+                Iniciar sesión
+            </h1>
+
+            <p class="text-sm text-base-content/60 mt-2">
+                Ingresa tus credenciales para continuar.
+            </p>
+
+        </div>
+
+        <form method="POST" class="space-y-5">
+
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+
+                <div class="alert alert-error text-sm">
+
+                    {% for error in form.non_field_errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+            <!-- Usuario -->
+            <div>
+
+                <label class="label">
+                    <span class="label-text">
+                        Usuario
+                    </span>
+                </label>
+
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    required
+                    placeholder="Ingrese su usuario"
+                    class="
+                        input
+                        input-bordered
+                        w-full
+                        bg-base-100
+                    "
+                >
+
+            </div>
+
+            <!-- Password -->
+            <div>
+
+                <label class="label">
+                    <span class="label-text">
+                        Contraseña
+                    </span>
+                </label>
+
+                <div class="relative">
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                        placeholder="Ingrese su contraseña"
+                        class="
+                            input
+                            input-bordered
+                            w-full
+                            pr-12
+                            bg-base-100
+                        "
+                    >
+
+                    <button
+                        type="button"
+                        id="show-password-btn"
+                        onclick="togglePasswordVisibility()"
+                        class="
+                            absolute
+                            right-3
+                            top-1/2
+                            -translate-y-1/2
+                            text-base-content/60
+                            hover:text-primary
+                            transition
+                        "
+                    >
+
+                        {% include "icons/eye.html" %}
+                        {% include "icons/eye_close.html" %}
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- Botón -->
+
+            <button
+                type="submit"
+                class="
+                    btn
+                    btn-primary
+                    w-full
+                    mt-2
+                "
+            >
+                Iniciar sesión
+            </button>
+
+        </form>
+
+        <div class="divider my-6"></div>
+
+        <p class="text-center text-sm text-base-content/60">
+
+            ¿Olvidaste tu contraseña?
+
+            <a
+                href="{% url 'password_reset' %}"
+                class="
+                    text-primary
+                    hover:underline
+                "
+            >
+                Recuperar
+            </a>
+
+        </p>
+
+    </main>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/accounts.js' %}"></script>
+{% endblock scripts %}

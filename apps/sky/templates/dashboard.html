@@ -1,0 +1,440 @@
+{% extends "body.html" %}
+
+{% block content %}
+
+<div class="space-y-6 mb-10">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+
+        <div class="flex items-center gap-5">
+
+            <div class="bg-blue-600 p-3 rounded-full text-white">
+                {% include "icons/dashboard.html" %}
+            </div>
+
+            <div>
+
+                <h1 class="text-2xl font-semibold">
+                    Dashboard
+                </h1>
+
+                <p class="text-sm text-base-content/60 mt-1">
+                    Resumen general del comportamiento de las automatizaciones.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="badge badge-primary badge-lg">
+            Envios en el mes <span class="text-xl pl-2">{{ current_month.total }}</span>
+        </div>
+
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+
+        <div class="bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom p-6">
+
+            <p class="text-sm text-base-content/60">
+                Asociados
+            </p>
+
+            <h2 class="text-4xl font-bold mt-3">
+                {{ summary.customers }}
+            </h2>
+
+        </div>
+
+        <div class="bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom p-6">
+
+            <p class="text-sm text-base-content/60">
+                Obligaciones
+            </p>
+
+            <h2 class="text-4xl font-bold mt-3">
+                {{ summary.obligations }}
+            </h2>
+
+        </div>
+
+        <div class="bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom p-6">
+
+            <p class="text-sm text-base-content/60">
+                Automatizaciones activas
+            </p>
+
+            <h2 class="text-4xl font-bold mt-3">
+                {{ automation_resume.active }}
+            </h2>
+
+            <p class="text-xs text-success mt-2">
+                {{ automation_resume.total }} registradas
+            </p>
+
+        </div>
+
+        <div class="bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom p-6">
+
+            <p class="text-sm text-base-content/60">
+                Correos enviados
+            </p>
+
+            <h2 class="text-4xl font-bold mt-3">
+                {{ summary.executions }}
+            </h2>
+
+        </div>
+
+    </div>
+
+    <!-- Mes actual -->
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+        <div class="bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom p-6">
+
+            <h2 class="text-lg font-semibold mb-5">
+
+                Mes actual
+
+            </h2>
+
+            <div class="grid grid-cols-3 gap-4">
+
+                <div class="bg-base-100 rounded-xl p-5 text-center">
+
+                    <p class="text-sm text-base-content/60">
+
+                        Exitosos
+
+                    </p>
+
+                    <h2 class="text-5xl font-bold text-success mt-3">
+
+                        {{ current_month.success }}
+
+                    </h2>
+
+                </div>
+
+                <div class="bg-base-100 rounded-xl p-5 text-center">
+
+                    <p class="text-sm text-base-content/60">
+
+                        Fallidos
+
+                    </p>
+
+                    <h2 class="text-5xl font-bold text-error mt-3">
+
+                        {{ current_month.failed }}
+
+                    </h2>
+
+                </div>
+
+                <div class="bg-base-100 rounded-xl p-5 text-center">
+
+                    <p class="text-sm text-base-content/60">
+
+                        Total
+
+                    </p>
+
+                    <h2 class="text-5xl font-bold mt-3">
+
+                        {{ current_month.total }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom p-6">
+
+            <h2 class="text-lg font-semibold mb-5">
+
+                Mes anterior
+
+            </h2>
+
+            <div class="grid grid-cols-3 gap-4">
+
+                <div class="bg-base-100 rounded-xl p-5 text-center">
+
+                    <p class="text-sm text-base-content/60">
+
+                        Exitosos
+
+                    </p>
+
+                    <h2 class="text-5xl font-bold text-success mt-3">
+
+                        {{ previous_month.success }}
+
+                    </h2>
+
+                </div>
+
+                <div class="bg-base-100 rounded-xl p-5 text-center">
+
+                    <p class="text-sm text-base-content/60">
+
+                        Fallidos
+
+                    </p>
+
+                    <h2 class="text-5xl font-bold text-error mt-3">
+
+                        {{ previous_month.failed }}
+
+                    </h2>
+
+                </div>
+
+                <div class="bg-base-100 rounded-xl p-5 text-center">
+
+                    <p class="text-sm text-base-content/60">
+
+                        Total
+
+                    </p>
+
+                    <h2 class="text-5xl font-bold mt-3">
+
+                        {{ previous_month.total }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Automatizaciones -->
+    <div class="grid grid-cols-1 gap-6">
+
+        <div class="bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom p-6">
+
+            <h2 class="text-lg font-semibold mb-5">
+
+                Automatizaciones programadas
+
+            </h2>
+
+            <div class="space-y-3">
+
+                {% for automation in scheduled_automations %}
+
+                    <div class="bg-base-100 rounded-xl p-4 flex justify-between">
+
+                        <div>
+
+                            <p class="font-medium">
+
+                                {{ automation.name }}
+
+                            </p>
+
+                            <p class="text-xs text-base-content/60">
+
+                                {{ automation.list_days }}
+
+                            </p>
+
+                        </div>
+
+                        <div class="badge badge-primary">
+
+                            {{ automation.get_hour }}
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="flex flex-row gap-4">
+        <div class="w-[65%] bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom p-6">
+
+            <h2 class="text-lg font-semibold mb-5">
+
+                Últimos envíos
+
+            </h2>
+
+            <div class="space-y-3">
+
+                {% for execution in last_executions %}
+
+                    <div class="bg-base-100 rounded-xl p-4">
+
+                        <div class="flex justify-between">
+
+                            <div>
+
+                                <p class="font-medium">
+
+                                    {{ execution.customer.first_name }}
+
+                                </p>
+
+                                <p class="text-xs text-base-content/60">
+
+                                    {{ execution.automation }}
+
+                                </p>
+
+                            </div>
+
+                            <div class="flex flex-col justify-end gap-1">
+
+                                {% if execution.status == "success" %}
+
+                                    <div class="badge badge-success">
+                                        Enviado
+                                    </div>
+                                    <p class="text-xs text-base-content/60">{{ execution.executed_at }}</p>
+
+                                {% else %}
+
+                                    <div class="badge badge-error">
+                                        Error
+                                    </div>
+                                    <p class="text-xs text-base-content/60">{{ execution.executed_at }}</p>
+
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        <div class="w-[35%] grid grid-cols-1 gap-6">
+
+            <div class="bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom p-6">
+
+                <h2 class="font-semibold mb-4 text-xl">
+
+                    Estado de asociados
+
+                </h2>
+
+                <div class="space-y-3">
+
+                    <div class="flex justify-between">
+
+                        <span>Activos</span>
+
+                        <span>{{ customers_resume.active }}</span>
+
+                    </div>
+
+                    <div class="flex justify-between">
+
+                        <span>Inactivos</span>
+
+                        <span>{{ customers_resume.inactive }}</span>
+
+                    </div>
+
+                    <div class="flex justify-between">
+
+                        <span>En mora</span>
+
+                        <span>{{ customers_resume.mora }}</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom p-6">
+
+                <h2 class="font-semibold mb-4">
+
+                    Top ciudades
+
+                </h2>
+
+                <div class="space-y-3">
+
+                    {% for city in cities_resume %}
+
+                        <div class="flex justify-between">
+
+                            <span>{{ city.city }}</span>
+
+                            <span>{{ city.total }}</span>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+            <div class="bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom p-6">
+
+                <h2 class="font-semibold mb-4">
+
+                    Top automatizaciones
+
+                </h2>
+
+                <div class="space-y-3">
+
+                    {% for automation in top_automations %}
+
+                        <div class="flex justify-between">
+
+                            <span>
+
+                                {{ automation.automation__name }}
+
+                            </span>
+
+                            <span>
+
+                                {{ automation.total }}
+
+                            </span>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

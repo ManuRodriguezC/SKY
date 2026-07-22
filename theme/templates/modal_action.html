@@ -1,0 +1,54 @@
+<dialog id="confirmation-modal" class="modal">
+    <div class="modal-box">
+
+        <h3 id="modal-title" class="font-bold text-lg"></h3>
+
+        <p id="modal-message" class="py-4"></p>
+
+        <div class="modal-action">
+
+            <form id="confirmation-form" method="post">
+                {% csrf_token %}
+
+                <button
+                    id="modal-submit-button"
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Confirmar
+                </button>
+            </form>
+
+            <button
+                type="button"
+                class="btn"
+                onclick="document.getElementById('confirmation-modal').close()"
+            >
+                Cancelar
+            </button>
+
+        </div>
+    </div>
+</dialog>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        const form = document.getElementById("confirmation-form");
+        const button = document.getElementById("modal-submit-button");
+
+        form.addEventListener("submit", () => {
+
+            button.disabled = true;
+
+            button.classList.add(
+                "opacity-50",
+                "cursor-not-allowed"
+            );
+
+            button.innerText = "Procesando...";
+
+        });
+
+    });
+</script>

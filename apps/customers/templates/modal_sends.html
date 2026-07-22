@@ -1,0 +1,113 @@
+<dialog id="history_modal" class="modal">
+
+    <div
+    class="modal-box overflow-y-hidden"
+    style="width:1200px; max-width:700px;"
+>
+
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex flex-col justify-start gap-3">
+                <h2 class="text-xl font-semibold">
+                    Historial de envíos
+                </h2>
+
+                <p class="text-xs text-base-content/60">El numero de envios generados para el asociado son: {{ executions.count }}</p>
+            </div>
+
+            <form method="dialog">
+
+                <button class="btn btn-sm btn-circle">
+                    ✕
+                </button>
+
+            </form>
+
+        </div>
+
+        {% if executions %}
+
+            <div class="max-h-[600px] overflow-y-auto pr-2 space-y-4 pb-28">
+
+                {% for execution in executions %}
+
+                    <div
+                        class="
+                            rounded-xl
+                            border
+                            border-[var(--border-shadow)]
+                            p-5
+                        "
+                    >
+
+                        <div class="flex justify-between">
+
+                            <div>
+
+                                <p class="font-semibold">
+                                    {{ execution.automation }}
+                                </p>
+
+                                <p class="text-sm text-base-content/60">
+                                    {{ execution.email }}
+                                </p>
+
+                            </div>
+
+                            <div class="text-right">
+
+                                <span
+                                    class="
+                                        badge
+                                        {% if execution.status == 'success' %}
+                                            badge-success
+                                        {% else %}
+                                            badge-error
+                                        {% endif %}
+                                    "
+                                >
+                                    {{ execution.get_status_display }}
+                                </span>
+
+                                <p class="text-xs mt-2 text-base-content/50">
+                                    {{ execution.executed_at }}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="
+                                bg-base-200
+                                rounded-lg
+                                mt-2
+                                p-2
+                                text-xs
+                            "
+                        >
+                            {{ execution.message }}
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-10 text-base-content/60">
+
+                No existen registros de envíos.
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+    <form method="dialog" class="modal-backdrop">
+        <button>Cerrar</button>
+    </form>
+
+</dialog>

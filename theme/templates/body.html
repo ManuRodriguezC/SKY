@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+    <div class="flex h-screen">
+
+        {% include 'aside.html' %}
+
+        <main class="flex-1 overflow-auto">
+            {% include "nav.html" %}
+
+            <div class="px-6 py-2">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+
+    </div>
+
+    {% include "modal_action.html" %}
+
+    {% if messages %}
+        {% include "modal_message.html" %}
+    {% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ block.super }}
+    <script defer src="{% static 'js/body.js' %}"></script>
+    <script defer src="{% static 'js/customers/customers.js' %}"></script>
+    <script defer src="{% static 'js/automation/actions.js' %}"></script>
+
+    <script>
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+
+            alerts.forEach(alert => {
+                alert.style.transition = "all 1s ease";
+                alert.style.opacity = "0";
+                alert.style.transform = "translateY(20px)";
+
+                setTimeout(() => {
+                    alert.remove();
+                }, 500);
+            });
+
+        }, 5000);
+    </script>
+
+{% endblock scripts %}

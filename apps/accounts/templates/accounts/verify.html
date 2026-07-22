@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block body %}
+
+<div class="min-h-screen flex items-center justify-center bg-base-300 px-4">
+
+    <main
+        class="
+            w-full
+            max-w-md
+            bg-base-200
+            rounded-2xl
+            border
+            border-[var(--border-shadow)]
+            shadow-custom
+            p-8
+        "
+    >
+
+        <!-- Header -->
+        <div class="flex flex-col items-center mb-8">
+
+            <div class="bg-info p-4 rounded-full text-white mb-4">
+                {% include "icons/info.html" %}
+            </div>
+
+            <h1 class="text-2xl font-semibold">
+                Cuenta ya verificada
+            </h1>
+
+            <p class="text-sm text-base-content/60 mt-2 text-center">
+                Este enlace de verificación ya fue utilizado anteriormente.
+            </p>
+
+        </div>
+
+        <!-- Mensajes -->
+
+        <div class="space-y-5">
+
+            <div class="alert alert-info">
+
+                <span>
+
+                    Tu cuenta ya se encuentra verificada y activa.
+
+                </span>
+
+            </div>
+
+            <p class="text-center text-sm text-base-content/60">
+
+                Ya puedes iniciar sesión con tus credenciales y comenzar a utilizar la plataforma.
+
+            </p>
+
+        </div>
+
+        <div class="divider my-6"></div>
+
+        <a
+            href="{% url 'login' %}"
+            class="btn btn-primary w-full"
+        >
+            Ir al inicio de sesión
+        </a>
+
+    </main>
+
+</div>
+
+{% endblock %}

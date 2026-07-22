@@ -1,0 +1,158 @@
+{% extends "body.html" %}
+
+{% block content %}
+
+<div class="w-full p-2 mx-auto">
+
+    <div class="bg-base-200 shadow-2xl rounded-3xl p-10 border border-base-300">
+
+        <!-- Header -->
+        <div class="mb-10 flex items-center justify-between">
+            <div>
+                <h1 class="text-4xl font-bold text-primary">
+                    {{ title }}
+                </h1>
+
+                <p class="text-base-content/70 mt-2">
+                    {{ message }}
+                </p>
+            </div>
+
+            {% url 'groups' as groups_url %}
+            {% include "configurator/back_button.html" with url=groups_url %}
+        </div>
+
+        <form method="post" class="space-y-8">
+            {% csrf_token %}
+
+            <!-- Inputs -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">
+                            Usuario
+                        </span>
+                    </label>
+                    {{ form.username }}
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">
+                            Email
+                        </span>
+                    </label>
+                    {{ form.email }}
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">
+                            Nombre
+                        </span>
+                    </label>
+                    {{ form.first_name }}
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">
+                            Apellido
+                        </span>
+                    </label>
+                    {{ form.last_name }}
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">
+                            Teléfono
+                        </span>
+                    </label>
+                    {{ form.phone_number }}
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">
+                            Documento
+                        </span>
+                    </label>
+                    {{ form.document }}
+                </div>
+
+                <div class="form-control md:col-span-2">
+                    <label class="label">
+                        <span class="label-text font-semibold">
+                            Dirección
+                        </span>
+                    </label>
+                    {{ form.address }}
+                </div>
+
+            </div>
+
+            <!-- Groups -->
+            <div class="bg-base-100 rounded-2xl p-6 border border-base-300">
+
+                <div class="mb-5">
+                    <h2 class="text-xl font-bold">
+                        Grupos
+                    </h2>
+
+                    <p class="text-sm text-base-content/60">
+                        Selecciona los grupos que tendrá el usuario.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                    {% for checkbox in form.groups %}
+                    <label class="cursor-pointer">
+
+                        <div class="
+                            flex items-center gap-3
+                            rounded-xl border border-base-300
+                            bg-base-200
+                            p-4
+                            hover:border-primary
+                            hover:bg-base-300
+                            transition-all duration-200
+                        ">
+
+                            {{ checkbox.tag }}
+
+                            <span class="font-medium">
+                                {{ checkbox.choice_label }}
+                            </span>
+
+                        </div>
+
+                    </label>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end gap-4 pt-4">
+
+                <a href="{% url 'users' %}" class="btn btn-ghost">
+                    Cancelar
+                </a>
+
+                <button class="btn btn-primary px-10">
+                    {{ button }}
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

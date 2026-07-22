@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block body %}
+
+<div class="min-h-screen flex items-center justify-center bg-base-300 px-4">
+
+    <main
+        class="
+            w-full
+            max-w-md
+            bg-base-200
+            rounded-2xl
+            border
+            border-[var(--border-shadow)]
+            shadow-custom
+            p-8
+        "
+    >
+
+        <!-- Header -->
+        <div class="flex flex-col items-center mb-8">
+
+            <div class="bg-error p-4 rounded-full text-white mb-4">
+                {% include "icons/error.html" %}
+            </div>
+
+            <h1 class="text-2xl font-semibold">
+                Enlace no válido
+            </h1>
+
+            <p class="text-sm text-base-content/60 mt-2 text-center">
+                No fue posible validar el enlace de verificación.
+            </p>
+
+        </div>
+
+        <!-- Mensajes -->
+
+        <div class="space-y-5">
+
+            <div class="alert alert-error">
+
+                <span>
+
+                    El enlace utilizado no existe, es incorrecto o ya no se encuentra disponible.
+
+                </span>
+
+            </div>
+
+            <p class="text-center text-sm text-base-content/60">
+
+                Si aún no has verificado tu cuenta, inicia sesión para solicitar
+                un nuevo correo de verificación o comunícate con un administrador.
+
+            </p>
+
+        </div>
+
+        <div class="divider my-6"></div>
+
+        <a
+            href="{% url 'login' %}"
+            class="btn btn-primary w-full"
+        >
+            Ir al inicio de sesión
+        </a>
+
+    </main>
+
+</div>
+
+{% endblock %}

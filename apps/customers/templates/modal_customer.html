@@ -1,0 +1,69 @@
+<dialog id="customer_modal" class="modal">
+
+    <div
+    class="modal-box overflow-y-hidden"
+    style="width:1200px; max-width:700px;"
+>
+
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex flex-col justify-start gap-3">
+                <h2 class="text-xl font-semibold">
+                    Historial del asociado
+                </h2>
+
+                <p class="text-xs text-base-content/60">Aca podra ver las fechas de registro y actualizacion del asociado.</p>
+            </div>
+
+            <form method="dialog">
+
+                <button class="btn btn-sm btn-circle">
+                    ✕
+                </button>
+
+            </form>
+
+        </div>
+
+        {% if logs %}
+
+            <div class="max-h-[600px] overflow-y-auto pr-2 space-y-4 pb-28">
+
+              {% for log in logs %}
+
+                <div class="border-l-2 border-primary pl-5 pb-5">
+
+                    <p class="font-medium">
+                        {{ log.get_action_display }}
+                    </p>
+
+                    <p class="text-sm text-base-content/60">
+                        {{ log.description }}
+                    </p>
+
+                    <p class="text-xs text-base-content/40 mt-1">
+                        {{ log.created_at }}
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-10 text-base-content/60">
+
+                No existen registros de envíos.
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+    <form method="dialog" class="modal-backdrop">
+        <button>Cerrar</button>
+    </form>
+
+</dialog>

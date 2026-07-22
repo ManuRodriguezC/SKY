@@ -1,0 +1,12 @@
+Django==6.0.2
+psycopg2-binary
+django-environ
+gunicorn
+django-tailwind
+Pillow==11.3.0
+
+pandas==2.3.0
+openpyxl==3.1.5
+
+celery==5.5.3
+redis==6.2.0

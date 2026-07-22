@@ -1,0 +1,98 @@
+{% extends "body.html" %}
+
+{% block content %}
+
+<form method="post">
+
+{% csrf_token %}
+
+<div class="w-full bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom overflow-hidden">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between px-6 py-7">
+
+        <div class="flex items-center gap-5">
+
+            <div class="bg-blue-600 p-3 rounded-full text-white">
+                {% include "icons/groups.html" %}
+            </div>
+
+            <div>
+
+                <h1 class="text-xl font-semibold">
+                    {{ title }}
+                </h1>
+
+                <p class="text-sm text-base-content/60 mt-1">
+                    Configura el nombre del grupo y asigna los permisos correspondientes.
+                </p>
+
+            </div>
+
+        </div>
+
+        {% url 'groups' as groups_url %}
+        {% include "configurator/back_button.html" with url=groups_url %}
+
+    </div>
+
+    <!-- Información -->
+    <div class="px-6 pb-6">
+
+        <div class="bg-base-100 rounded-xl border border-[var(--border-shadow)] p-6">
+
+            <h2 class="font-semibold text-lg mb-5">
+                Información general
+            </h2>
+
+            <div>
+
+                <label class="label">
+                    <span class="label-text">
+                        Nombre del grupo
+                    </span>
+                </label>
+
+                {{ form.name }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Permisos -->
+    <div class="px-6 pb-6">
+
+        {% include "permissions_list.html" %}
+
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 py-6 border-t border-[var(--border-shadow)] bg-base-100">
+
+        <div class="flex justify-end gap-3">
+
+            <a
+                href="{% url 'groups' %}"
+                class="btn btn-ghost"
+            >
+                Cancelar
+            </a>
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                {{ button_text }}
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+</form>
+
+{% endblock %}

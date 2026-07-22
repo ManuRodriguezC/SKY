@@ -1,0 +1,158 @@
+{% if is_paginated %}
+
+    <div class="flex items-center justify-between px-6 py-4">
+
+        <!-- Info -->
+        <p class="text-sm text-base-content/60">
+            Mostrando
+            {{ page_obj.start_index }}
+            a
+            {{ page_obj.end_index }}
+            de
+            {{ paginator.count }}
+            resultados
+        </p>
+
+        <!-- Pagination -->
+        <div class="flex items-center gap-2">
+
+            <!-- Prev -->
+            {% if page_obj.has_previous %}
+                <a
+                    href="?status={{ request.GET.status }}&page={{ page_obj.previous_page_number }}"
+                    class="
+                        w-9 h-9
+                        rounded-lg
+                        border border-[var(--border-color)]
+                        flex items-center justify-center
+                        hover:bg-[var(--base-hover)]
+                        transition-all
+                    "
+                >
+                    ←
+                </a>
+            {% endif %}
+
+            <!-- First page -->
+            {% if page_obj.number == 1 %}
+                <span
+                    class="
+                        w-9 h-9
+                        rounded-lg
+                        bg-primary
+                        text-white
+                        flex items-center justify-center
+                        text-sm font-medium
+                    "
+                >
+                    1
+                </span>
+            {% else %}
+                <a
+                    href="?page=1"
+                    class="
+                        w-9 h-9
+                        rounded-lg
+                        border border-[var(--border-color)]
+                        flex items-center justify-center
+                        hover:bg-[var(--base-hover)]
+                        transition-all
+                        text-sm
+                    "
+                >
+                    1
+                </a>
+            {% endif %}
+
+            <!-- Previous page number -->
+            {% if page_obj.number > 2 %}
+                <a
+                    href="?status={{ request.GET.status }}&page={{ page_obj.number|add:'-1' }}"
+                    class="
+                        w-9 h-9
+                        rounded-lg
+                        border border-[var(--border-color)]
+                        flex items-center justify-center
+                        hover:bg-[var(--base-hover)]
+                        transition-all
+                        text-sm
+                    "
+                >
+                    {{ page_obj.number|add:'-1' }}
+                </a>
+            {% endif %}
+
+            <!-- Current page -->
+            {% if page_obj.number > 1 and page_obj.number < paginator.num_pages %}
+                <span
+                    class="
+                        w-9 h-9
+                        rounded-lg
+                        bg-primary
+                        text-white
+                        flex items-center justify-center
+                        text-sm font-medium
+                    "
+                >
+                    {{ page_obj.number }}
+                </span>
+            {% endif %}
+
+            <!-- Next page number -->
+            {% if page_obj.number < paginator.num_pages|add:'-1' %}
+                <a
+                    href="?status={{ request.GET.status }}&page={{ page_obj.number|add:'1' }}"
+                    class="
+                        w-9 h-9
+                        rounded-lg
+                        border border-[var(--border-color)]
+                        flex items-center justify-center
+                        hover:bg-[var(--base-hover)]
+                        transition-all
+                        text-sm
+                    "
+                >
+                    {{ page_obj.number|add:'1' }}
+                </a>
+            {% endif %}
+
+            <!-- Last page -->
+            {% if paginator.num_pages > 1 and page_obj.number != paginator.num_pages %}
+                <a
+                    href="?status={{ request.GET.status }}&page={{ paginator.num_pages }}"
+                    class="
+                        w-9 h-9
+                        rounded-lg
+                        border border-[var(--border-color)]
+                        flex items-center justify-center
+                        hover:bg-[var(--base-hover)]
+                        transition-all
+                        text-sm
+                    "
+                >
+                    {{ paginator.num_pages }}
+                </a>
+            {% endif %}
+
+            <!-- Next -->
+            {% if page_obj.has_next %}
+                <a
+                    href="?status={{ request.GET.status }}&page={{ page_obj.next_page_number }}"
+                    class="
+                        w-9 h-9
+                        rounded-lg
+                        border border-[var(--border-color)]
+                        flex items-center justify-center
+                        hover:bg-[var(--base-hover)]
+                        transition-all
+                    "
+                >
+                    →
+                </a>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+{% endif %}
