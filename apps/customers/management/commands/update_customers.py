@@ -60,6 +60,7 @@ class Command(BaseCommand):
                     "phone": row["AP - Teléfono celular"],
                     "score": row["CA - Calificación Crédito"],
                     "city": city,
+                    "contributions": row[""]
                 }
             )
 

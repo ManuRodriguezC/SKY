@@ -30,6 +30,7 @@ class Customer(models.Model):
     phone = models.CharField()
     score = models.CharField(max_length=10)
     city = models.CharField(max_length=100, null=True, blank=True)
+    contributions = models.IntegerField(null=True, blank=True)
     test = models.BooleanField(default=False)
     
     @property

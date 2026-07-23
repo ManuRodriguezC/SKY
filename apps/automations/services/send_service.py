@@ -74,11 +74,13 @@ def send_text_email(
         )
 
 def send_html_email(
-    email,
+    object,
     automation,
     content,
 ):
 
+    email = get_email(object)
+    
     send_email = EmailMultiAlternatives(
         subject=automation.subject,
         body="",
@@ -136,7 +138,6 @@ def send_html_email(
             object,
             content
         )
-        print("En envia y se guarda")
     except:
         AutomationExecution.register_failed(
             automation,
