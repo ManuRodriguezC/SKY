@@ -284,7 +284,8 @@ class AutomationFilterForm(forms.ModelForm):
         range_from = cleaned_data.get("range_from")
 
         range_to = cleaned_data.get("range_to")
-
+        print(value)
+        print(cleaned_data)
         if operator == "between":
 
             if not range_from:

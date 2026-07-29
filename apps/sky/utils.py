@@ -1,7 +1,7 @@
 from calendar import monthrange
 from datetime import date, timedelta
 
-from django.db.models import Count
+from django.db.models import Count, Q, Min
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 
@@ -187,12 +187,24 @@ class DashboardService:
 
         return (
             AutomationExecution.objects
-            .select_related(
+            .values(
                 "automation",
-                "customer",
+                "automation__name",
+                "executed_day",
+            )
+            .annotate(
+                first_execution=Min("executed_at"),
+                success=Count(
+                    "id",
+                    filter=Q(status=AutomationExecution.Status.SUCCESS)
+                ),
+                failed=Count(
+                    "id",
+                    filter=Q(status=AutomationExecution.Status.FAILED)
+                ),
             )
             .order_by(
-                "-executed_at"
+                "-first_execution"
             )[:10]
         )
 

@@ -110,7 +110,7 @@
                 <select name="city" id="select-city" class="select select-bordered w-full bg-base-200">
                     <option value="">----------</option>
                     {% for city in citys %}
-                        <option value={{ city }}>{{ city }}</option>
+                        <option value="{{ city }}">{{ city }}</option>
                     {% endfor %}
                 </select>
 
@@ -143,7 +143,7 @@
                 <select name="status" id="select-status" class="select select-bordered w-full bg-base-200">
                     <option value="">----------</option>
                     {% for type in status_customers %}
-                        <option value={{ type }}>{{ type }}</option>
+                        <option value="{{ type }}">{{ type }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -159,7 +159,23 @@
                 <select name="type" id="select-type" class="select select-bordered w-full bg-base-200">
                     <option value="">----------</option>
                     {% for type in type_customers %}
-                        <option value={{ type }}>{{ type }}</option>
+                        <option value="{{ type }}">{{ type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Nominas -->
+            <div class="w-[200px] filter-nominas hidden">
+                <label class="label w-full">
+                    <span class="label-text">
+                        Nominas
+                    </span>
+                </label>
+
+                <select name="nominas" id="select-nominas" class="select select-bordered w-full bg-base-200">
+                    <option value="">----------</option>
+                    {% for nomina in nominas %}
+                        <option value="{{ nomina }}">{{ nomina }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -201,167 +217,90 @@
 
 <script>
 
-document.addEventListener("DOMContentLoaded", () => {
-    const selectOptions = ["city", "gender", "status", "type_associate"]
+    document.addEventListener("DOMContentLoaded", () => {
 
-    const operator = document.querySelector(
-        ".filter-operator"
-    );
+        const field = document.querySelector('select[name="field"]');
+        const operator = document.querySelector(".filter-operator");
+        const valueInput = document.querySelector('[name="value"]');
 
-    const valueContainer = document.querySelector(
-        ".filter-value"
-    );
+        const valueContainer = document.querySelector(".filter-value");
+        const rangeFromContainer = document.querySelector(".filter-range-from");
+        const rangeToContainer = document.querySelector(".filter-range-to");
 
-    const rangeFromContainer = document.querySelector(
-        ".filter-range-from"
-    );
+        const selectContainers = {
+            city: document.querySelector(".filter-city"),
+            gender: document.querySelector(".filter-gender"),
+            status: document.querySelector(".filter-status-customer"),
+            type_associate: document.querySelector(".filter-type-customer"),
+            nomina_name: document.querySelector(".filter-nominas"),
+        };
 
-    const rangeToContainer = document.querySelector(
-        ".filter-range-to"
-    );
+        const selects = {
+            city: document.querySelector("#select-city"),
+            gender: document.querySelector("#select-gender"),
+            status: document.querySelector("#select-status"),
+            type_associate: document.querySelector("#select-type"),
+            nomina_name: document.querySelector("#select-nominas"),
+        };
 
-    const cityContainer = document.querySelector(
-        ".filter-city"
-    )
+        const selectFields = Object.keys(selects);
 
-    const typeCustomerContainer = document.querySelector(
-        ".filter-type-customer"
-    )
+        function hideAll() {
+            valueContainer.classList.add("hidden");
+            rangeFromContainer.classList.add("hidden");
+            rangeToContainer.classList.add("hidden");
 
-    const genderContainer = document.querySelector(
-        ".filter-gender"
-    )
-
-    const statusCustomerContainer = document.querySelector(
-        ".filter-status-customer"
-    )
-
-    let field = document.querySelector('select[name="field"]');
-
-    function hiddenAll() {
-        valueContainer.classList.add(
-            "hidden"
-        );
-
-        rangeFromContainer.classList.add(
-            "hidden"
-        );
-
-        rangeToContainer.classList.add(
-            "hidden"
-        );
-        
-        cityContainer.classList.add(
-            "hidden"
-        )
-
-        typeCustomerContainer.classList.add(
-            "hidden"
-        )
-
-        genderContainer.classList.add(
-            "hidden"
-        )
-
-        statusCustomerContainer.classList.add(
-            "hidden"
-        )
-    }
-
-    function toggleFields() {
-        let fieldValue = field.value;
-
-        const isBetween =
-            operator.value === "between";
-
-        if (isBetween && !selectOptions.includes(fieldValue)) {
-            hiddenAll();
-            rangeFromContainer.classList.remove(
-                "hidden"
-            );
-
-            rangeToContainer.classList.remove(
-                "hidden"
-            );
-
-        } else {
-            valueContainer.classList.remove(
-                "hidden"
-            );
-            toggleChangeField()
+            Object.values(selectContainers).forEach(container => {
+                container.classList.add("hidden");
+            });
         }
-    }
 
-    function toggleChangeField() {
-        let fieldValue = field.value;
+        function loadSelectedValue() {
+            const fieldValue = field.value;
 
-        if (selectOptions.includes(fieldValue)) {
-            hiddenAll();
-
-            if (fieldValue === "city") {
-                cityContainer.classList.remove(
-                    "hidden"
-                )
-            } else if (fieldValue === "gender") {
-                genderContainer.classList.remove(
-                    "hidden"
-                )
-            } else if (fieldValue === "status") {
-                statusCustomerContainer.classList.remove(
-                    "hidden"
-                )
-            } else if (fieldValue === "type_associate") {
-                typeCustomerContainer.classList.remove(
-                    "hidden"
-                )
-            } 
-        } else {
-            hiddenAll();
-            valueContainer.classList.remove(
-                "hidden"
-            );
+            if (selects[fieldValue]) {
+                selects[fieldValue].value = valueInput.value;
+            }
         }
-    }
 
-    toggleFields();
-    loadSelectedValue();
+        function toggleFields() {
 
-    operator.addEventListener(
-        "change",
-        toggleFields
-    );
+            hideAll();
 
-    field.addEventListener(
-        "change",
-        toggleChangeField
-    )
+            const fieldValue = field.value;
+            const isBetween = operator.value === "between";
 
-    function loadSelectedValue() {
-        const fieldValue = field.value;
-        const value = document.querySelector('[name="value"]').value;
+            if (isBetween && !selectFields.includes(fieldValue)) {
 
-        switch (fieldValue) {
-            case "city":
-                document.querySelector("#select-city").value = value;
-                break;
+                rangeFromContainer.classList.remove("hidden");
+                rangeToContainer.classList.remove("hidden");
+                return;
+            }
 
-            case "gender":
-                document.querySelector("#select-gender").value = value;
-                break;
+            if (selectFields.includes(fieldValue)) {
 
-            case "status":
-                document.querySelector("#select-status").value = value;
-                break;
+                selectContainers[fieldValue].classList.remove("hidden");
+                loadSelectedValue();
+                return;
+            }
 
-            case "type_associate":
-                document.querySelector("#select-type").value = value;
-                break;
+            valueContainer.classList.remove("hidden");
         }
-    }
 
-});
+        Object.entries(selects).forEach(([_, select]) => {
 
+            select.addEventListener("change", function () {
+                valueInput.value = this.value;
+            });
 
+        });
 
+        field.addEventListener("change", toggleFields);
+
+        operator.addEventListener("change", toggleFields);
+
+        toggleFields();
+
+    });
 
 </script>

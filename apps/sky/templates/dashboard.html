@@ -281,42 +281,41 @@
 
                 {% for execution in last_executions %}
 
-                    <div class="bg-base-100 rounded-xl p-4">
+                   <div class="bg-base-100 rounded-xl p-4">
 
-                        <div class="flex justify-between">
+                        <div class="flex justify-between items-center">
 
                             <div>
 
                                 <p class="font-medium">
 
-                                    {{ execution.customer.first_name }}
+                                    {{ execution.automation__name }}
 
                                 </p>
 
                                 <p class="text-xs text-base-content/60">
 
-                                    {{ execution.automation }}
+                                    {{ execution.first_execution }}
 
                                 </p>
 
                             </div>
 
-                            <div class="flex flex-col justify-end gap-1">
+                            <div class="flex gap-2">
 
-                                {% if execution.status == "success" %}
+                                <div class="badge badge-success">
 
-                                    <div class="badge badge-success">
-                                        Enviado
-                                    </div>
-                                    <p class="text-xs text-base-content/60">{{ execution.executed_at }}</p>
+                                    {{ execution.success }} enviados
 
-                                {% else %}
+                                </div>
+
+                                {% if execution.failed > 0 %}
 
                                     <div class="badge badge-error">
-                                        Error
-                                    </div>
-                                    <p class="text-xs text-base-content/60">{{ execution.executed_at }}</p>
 
+                                        {{ execution.failed }} fallidos
+
+                                    </div>
 
                                 {% endif %}
 

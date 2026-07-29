@@ -49,6 +49,19 @@ def get_status_customers():
         .order_by("status")
     )
 
+def get_nominas():
+    return (
+        Customer.objects
+        .exclude(nomina_name__isnull=True)
+        .exclude(nomina_name="")
+        .values_list(
+            "nomina_name",
+            flat=True
+        )
+        .distinct()
+        .order_by("nomina_name")
+    )
+
 
 def build_customer_context(
     customer,
@@ -58,7 +71,8 @@ def build_customer_context(
         "apellido": customer.last_name,
         "ciudad": customer.city,
     }
-    
+
+
 def build_obligation_context(
     obligation,
 ):
@@ -68,12 +82,13 @@ def build_obligation_context(
         "obligacion": obligation.num_obligacion,
         "mora": obligation.mora_days,
         "ciudad": obligation.customer.city,
+        "total": obligation.total_formatted,
     }
 
 
 def get_email(object):
     if isinstance(object, Customer):
         return object.email
-    if isinstance(object, Obligations):
+    elif isinstance(object, Obligations):
         return object.customer.email
     return None

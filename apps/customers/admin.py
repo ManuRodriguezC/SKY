@@ -9,7 +9,7 @@ class CustomerAdmin(admin.ModelAdmin):
 @admin.register(Obligations)
 class ObligationsAdmin(admin.ModelAdmin):
     list_display = ('customer_name', 'num_obligacion', 'credit_line', 'mora_days')
-    search_fields =  ('customer_name', 'num_obligacion', 'credit_line', 'mora_days')
+    search_fields =  ('num_obligacion', 'credit_line', 'mora_days')
     
     @admin.display(description="Cliente")
     def customer_name(self, obj):

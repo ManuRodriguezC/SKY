@@ -4,32 +4,40 @@ from apps.customers.models import Customer, Obligations
 from apps.automations.models import FilterOperator
 
 CUSTOMER_FIELDS = {
-    "age",
-    "gender",
-    "city",
-    "score",
-    "status",
-    "type_associate",
+    "age": "age",
+    "gender": "gender",
+    "city": "city",
+    "score": "score",
+    "status": "status",
+    "type_associate": "type_associate",
+    "nomina_name": "nomina_name",
 }
 
 OBLIGATION_FIELDS = {
-    "mora_days",
+    "mora_days": "mora_days",
 }
 
 def build_queryset(automation):
     filter_obj = automation.filters_auto
-    
-    query = build_query(filter_obj)
 
     if filter_obj.field in CUSTOMER_FIELDS:
+        field = CUSTOMER_FIELDS[filter_obj.field]
+        query = build_query(filter_obj, field)
         return build_customer_queryset(query)
+
+    field = OBLIGATION_FIELDS.get(
+        filter_obj.field,
+        f"customer__{filter_obj.field}"
+    )
+
+    query = build_query(filter_obj, field)
+
     return build_obligation_queryset(query)
 
 
-def build_query(filter_obj):
+def build_query(filter_obj, field):
     query = Q()
 
-    field = filter_obj.field
     operator = filter_obj.operator
     value = filter_obj.value
     range_from = filter_obj.range_from
@@ -77,6 +85,13 @@ def build_query(filter_obj):
         query &= Q(
             **{
                 f"{field}__in": value
+            }
+        )
+    
+    elif operator == FilterOperator.DIF:
+        query &= ~Q(
+            **{
+                field: value
             }
         )
 

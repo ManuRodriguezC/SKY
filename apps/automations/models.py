@@ -184,6 +184,12 @@ class Automation(models.Model):
         if self.date_from and self.date_to:
             return f"{self.date_from} / {self.date_to}"
         return "No definido"
+    
+    @property
+    def apply(self):
+        from apps.automations.services.filter_engine import build_queryset
+        return build_queryset(self).count()
+
 
 
 class AutomationLog(models.Model):
@@ -263,6 +269,11 @@ class FilterField(models.TextChoices):
         "type_associate",
         "Tipo de asociado"
     )
+    
+    NOMINAS = (
+        "nomina_name",
+        "Nominas"
+    )
 
 
 class FilterOperator(models.TextChoices):
@@ -278,6 +289,8 @@ class FilterOperator(models.TextChoices):
     BETWEEN = "between", "Entre"
 
     IN = "in", "En lista"
+    
+    DIF = "diff", "Diferente"
 
 
 class AutomationFilter(models.Model):
@@ -387,8 +400,8 @@ class AutomationExecution(models.Model):
             cls.objects.create(
                 automation=automation,
                 customer=object.customer,
-                Obligations=object,
-                email=object.email,
+                obligation=object,
+                email=object.customer.email,
                 status=cls.Status.SUCCESS,
                 message=message,
             )
@@ -402,22 +415,26 @@ class AutomationExecution(models.Model):
         message,
     ):
 
-        if isinstance(object, Customer):    
-            cls.objects.create(
-                automation=automation,
-                customer=object,
-                email=object.email,
-                status=cls.Status.FAILED,
-                message=message,
-            )
-        
-        if isinstance(object, Obligations):
-            cls.objects.create(
-                automation=automation,
-                customer=object.customer,
-                Obligations=object,
-                email=object.email,
-                status=cls.Status.FAILED,
-                message=message,
-            )
+        try:
+            if isinstance(object, Customer):
+                cls.objects.create(
+                    automation=automation,
+                    customer=object,
+                    email=object.email or "",
+                    status=cls.Status.FAILED,
+                    message=message,
+                )
+
+            elif isinstance(object, Obligations):
+                cls.objects.create(
+                    automation=automation,
+                    customer=object.customer,
+                    obligation=object,
+                    email=getattr(object.customer, "email", "") or "",
+                    status=cls.Status.FAILED,
+                    message=message,
+                )
+
+        except Exception as e:
+            print(f"Error registrando la ejecución fallida de la automatización {e}")
 

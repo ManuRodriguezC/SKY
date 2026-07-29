@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
@@ -14,7 +13,8 @@ from apps.customers.utils import (
     get_type_customers,
     get_citys,
     get_gender,
-    get_status_customers
+    get_status_customers,
+    get_nominas
 )
 from apps.automations.services.filter_engine import build_queryset
 from apps.automations.tasks import execute_auto
@@ -50,7 +50,7 @@ class AutomationListView(ListView):
             "actives": automations.filter(active=True).count(),
             "inactives": automations.filter(active=False).count(),
             "all": automations.count(),
-            "logs": AutomationLog.objects.all().order_by("-id")
+            "logs": AutomationLog.objects.all().order_by("-id"),
         })
         
         return context
@@ -93,6 +93,7 @@ class AutomationCreateView(CreateView):
             "citys": get_citys(),
             "genders": get_gender(),
             "status_customers": get_status_customers(),
+            "nominas": get_nominas()
         })
 
         return context
@@ -180,6 +181,7 @@ class AutomationUpdateView(UpdateView):
             "citys": get_citys(),
             "genders": get_gender(),
             "status_customers": get_status_customers(),
+            "nominas": get_nominas()
         })
         
         return context
@@ -349,6 +351,8 @@ def execute_automation_now(request, id):
     return redirect("automations")
 
 def test_automation(request, id):
+    import traceback
+    
     automation = get_object_or_404(Automation,id=id)
     
     try:
@@ -367,11 +371,12 @@ def test_automation(request, id):
             f"La prueba de automatizacion se envio de forma exitosa, revise su correo origen o destino."
         )
 
-    except Exception:
-
+    except Exception as e:
+        print(e)
+        traceback.print_exc()
         messages.error(
             request,
-            "Se presentó un error al testear el correo de la automatizacion."
+            f"Se presentó un error al testear el correo de la automatizacion. {e}"
         )
 
     return redirect("automations")

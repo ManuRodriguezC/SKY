@@ -142,6 +142,14 @@ class Obligations(models.Model):
     def mora_status(self):
         return self.mora_days > Customer.MORA_DAYS
     
+    @property
+    def total_formatted(self):
+        try:
+            value = int(''.join(filter(str.isdigit, self.total)))
+            return f"$ {value:,}".replace(",", ".")
+        except (TypeError, ValueError):
+            return "$ 0"
+    
     
 class CustomerLog(models.Model):
 
