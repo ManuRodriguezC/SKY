@@ -2,13 +2,14 @@ from django.contrib import messages
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
+from django.db.models import Q
 
 from .forms import (
     AutomationForm,
     AutomationFilterForm,
 )
 
-from .models import Automation, AutomationLog
+from .models import Automation, AutomationLog, AutomationExecution
 from apps.customers.utils import (
     get_type_customers,
     get_citys,
@@ -262,6 +263,51 @@ class AutomationUpdateView(UpdateView):
                 )
 
         return changes
+
+
+class ExecutionListView(ListView):
+    model = AutomationExecution
+    template_name = "automations/execution_list.html"
+    context_object_name = "executions"
+    
+    paginate_by = 10
+    
+    def get_queryset(self):
+        queryset = AutomationExecution.objects.all().order_by("-id")
+        
+        search = self.request.GET.get("search")
+        status = self.request.GET.get("status")
+        
+        if status == AutomationExecution.Status.SUCCESS:
+            queryset = queryset.filter(status=AutomationExecution.Status.SUCCESS)
+        elif status == AutomationExecution.Status.FAILED:
+            queryset = queryset.filter(status=AutomationExecution.Status.FAILED)
+        
+        if search:
+            queryset = queryset.filter(
+                Q(customer__first_name__icontains=search) |
+                Q(customer__last_name__icontains=search) |
+                Q(email__icontains=search) |
+                Q(customer__document__icontains=search) |
+                Q(obligation__num_obligacion__icontains=search)
+            )
+        
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        executions = AutomationExecution.objects.all()
+        
+        context.update({
+            "title_page": "Ejecuciones",
+            "all": executions.count(),
+            "success": executions.filter(status=AutomationExecution.Status.SUCCESS).count(),
+            "failed": executions.filter(status=AutomationExecution.Status.FAILED).count(),
+        })
+        
+        return context
+    
 
 
 def automationChangeStatus(request, id):

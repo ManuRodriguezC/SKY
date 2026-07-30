@@ -3,6 +3,7 @@ from .views import (
     AutomationListView,
     AutomationCreateView,
     AutomationUpdateView,
+    ExecutionListView,
     automationChangeStatus,
     automationDelete,
     execute_automation_now,
@@ -17,5 +18,6 @@ urlpatterns = [
     path('cambiar-estado/<int:id>/', automationChangeStatus, name="change_status"),
     path('eliminar-automatizacion/<int:id>/', automationDelete, name="delete"),
     path('ejecutar-automatizacion/<int:id>/', execute_automation_now, name="execute_now"),
-    path('test-automatizacion/<int:id>/', test_automation, name="test_automation")
+    path('test-automatizacion/<int:id>/', test_automation, name="test_automation"),
+    path('registro-ejecuciones/', ExecutionListView.as_view(), name="executions"),
 ]

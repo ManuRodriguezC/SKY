@@ -191,7 +191,6 @@ class Automation(models.Model):
         return build_queryset(self).count()
 
 
-
 class AutomationLog(models.Model):
     class Action(models.TextChoices):
         CREATED = "created", "Creada"
@@ -379,6 +378,10 @@ class AutomationExecution(models.Model):
         auto_now_add=True
     )
 
+    def get_status(self):
+        if self.status == self.Status.SUCCESS:
+            return "Exitoso"
+        return "Fallido"
     
     @classmethod
     def register_success(

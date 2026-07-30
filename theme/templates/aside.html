@@ -55,6 +55,18 @@
 
             <span class="sidebar-text">Automatizaciones</span>
         </a>
+    
+        <a
+            href="{% url 'executions' %}"
+            class="flex items-center gap-3 px-4 py-2  hover:rounded hover:bg-[var(--base-hover)] hover:text-blue-500
+                hover:border-l-2 border-blue-600 transition-all duration-100"
+        >
+            <span class="w-5 h-5 flex">
+                {% include "icons/logs.html" %}
+            </span>
+
+            <span class="sidebar-text">Ejecuciones</span>
+        </a>
 
         <div class="w-full">
             <button
