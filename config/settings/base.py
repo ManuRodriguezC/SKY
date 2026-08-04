@@ -1,8 +1,18 @@
+import environ
+from pathlib import Path
+
 from celery.schedules import crontab
 from pathlib import Path
 import os
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+env = environ.Env()
+
+environ.Env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
@@ -138,15 +148,18 @@ CELERY_BEAT_SCHEDULE = {
         "task": (
             "apps.automations.tasks.check_automations"
         ),
-        "schedule": crontab(minute="*"), 
+        "schedule": crontab(minute="0"), 
     }
 }
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'estebanclimb@gmail.com'
-EMAIL_HOST_PASSWORD = 'ajru eebr osge fzze'
+
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = env("EMAIL_HOST")
 EMAIL_PORT = 587
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = (
-    EMAIL_HOST_USER
-)
+EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")

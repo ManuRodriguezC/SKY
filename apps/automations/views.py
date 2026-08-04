@@ -398,6 +398,7 @@ def execute_automation_now(request, id):
 
 def test_automation(request, id):
     import traceback
+    from apps.automations.services.email_connection import get_email_connection
     
     automation = get_object_or_404(Automation,id=id)
     
@@ -406,10 +407,13 @@ def test_automation(request, id):
         
         content = create_content(automation, object)
         
+        connection = get_email_connection()
+        
         send_customer_email(
             object=object,
             automation=automation,
             content=content,
+            connection=connection
         )
 
         messages.success(
@@ -419,10 +423,3 @@ def test_automation(request, id):
 
     except Exception as e:
         print(e)
-        traceback.print_exc()
-        messages.error(
-            request,
-            f"Se presentó un error al testear el correo de la automatizacion. {e}"
-        )
-
-    return redirect("automations")

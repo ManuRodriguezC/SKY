@@ -1,9 +1,12 @@
+import time
+from math import ceil
+
 from django.utils import timezone
 from django.db.models import Q
-from math import ceil
 
 from apps.automations.models import Automation
 from apps.automations.services.filter_engine import build_queryset
+from apps.automations.services.email_connection import get_email_connection
 
 
 def get_pending_automation():
@@ -39,10 +42,18 @@ def execute_automation(automation):
     objects = build_queryset(automation)
 
     action = get_action()
-    
-    for object in objects:
-        action(automation, object)
-    
+
+    connection = get_email_connection()
+
+    try:
+        for object in objects:
+            action(
+                automation=automation,
+                object=object,
+                connection=connection,
+            )
+    finally:
+        connection.close()
 
 def get_action():
     from apps.automations.tasks import send_email_task

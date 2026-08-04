@@ -1,3 +1,5 @@
+import traceback
+
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives, EmailMessage
 
@@ -11,6 +13,7 @@ def send_customer_email(
     object,
     automation,
     content,
+    connection
 ):
     if (
         automation.content_type ==
@@ -21,21 +24,32 @@ def send_customer_email(
             object,
             automation,
             content,
+            connection
         )
-
-    send_html_email(
-        object,
-        automation,
-        content,
-    )
+    else:
+        send_html_email(
+            object,
+            automation,
+            content,
+            connection
+        )
     
     
 def send_text_email(
     object,
     automation,
     content,
+    connection
 ):
     email = get_email(object)
+
+    if not is_valid_email(email):
+        AutomationExecution.register_failed(
+            automation,
+            object,
+            f"Correo inválido: {email!r}",
+        )
+        return
 
     send_email = EmailMessage(
         subject=automation.subject,
@@ -44,6 +58,7 @@ def send_text_email(
         to=[
             email
         ],
+        connection=connection,
     )
 
     if automation.image:
@@ -61,26 +76,38 @@ def send_text_email(
 
     try:
         send_email.send()
+
         AutomationExecution.register_success(
             automation,
             object,
             content
         )
-    except:
+    except Exception as e:
+        error = traceback.format_exc()
+
         AutomationExecution.register_failed(
             automation,
             object,
-            content
+            error
         )
 
 def send_html_email(
     object,
     automation,
     content,
+    connection
 ):
 
     email = get_email(object)
-    
+
+    if not is_valid_email(email):
+        AutomationExecution.register_failed(
+            automation,
+            object,
+            f"Correo inválido: {email!r}",
+        )
+        return
+
     send_email = EmailMultiAlternatives(
         subject=automation.subject,
         body="",
@@ -88,6 +115,7 @@ def send_html_email(
         to=[
             email
         ],
+        connection=connection,
     )
 
     if automation.image:
@@ -138,9 +166,23 @@ def send_html_email(
             object,
             content
         )
-    except:
+    except Exception as e:
+        error = traceback.format_exc()
+        
         AutomationExecution.register_failed(
             automation,
             object,
-            content
+            error
         )
+
+
+
+def is_valid_email(email):
+    from django.core.exceptions import ValidationError
+    from django.core.validators import validate_email
+    
+    try:
+        validate_email(email)
+        return True
+    except ValidationError:
+        return False

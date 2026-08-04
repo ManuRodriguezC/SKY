@@ -1,6 +1,3 @@
-from django.core.mail import send_mail
-from django.template import Context, Template
-
 from celery import shared_task
 
 from apps.automations.services.automation_service import process_pending_automations
@@ -15,10 +12,10 @@ def check_automations():
     process_pending_automations()
 
 
-@shared_task
 def send_email_task(
     automation,
     object,
+    connection
 ):
 
     content = create_content(automation, object)
@@ -27,10 +24,16 @@ def send_email_task(
         object=object,
         automation=automation,
         content=content,
+        connection=connection
     )
 
 @shared_task
 def execute_auto(automation_id):
-    automation = Automation.objects.get(id=automation_id)
-    if automation:
-        execute_automation(automation)
+    automation = Automation.objects.filter(id=automation_id).first()
+
+    if not automation:
+        return
+
+    execute_automation(
+        automation=automation,
+    )
