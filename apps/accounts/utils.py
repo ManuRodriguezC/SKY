@@ -12,6 +12,7 @@ TRANSLATIONS = {
 
 TRANSLATION_APP = {
     "accounts": "Usuarios",
+    "automations": "Automatizaciones",
     "admin": "Admin Django",
     "auth": "Autenticacion",
     "sessions": "Sesiones",
@@ -22,19 +23,23 @@ TRANSLATION_MODELS = {
     "permission": "permiso",
     "customuser": "usuarios",
     "logentry": "registros",
-    "session": "sesiones"
+    "session": "sesiones",
+    "automation": "automatizacion",
 }
 
 def get_permissions():
     permissions = Permission.objects.select_related(
             "content_type"
         ).order_by("content_type__app_label", "codename")
-        
+
     grouped_permissions = defaultdict(list)
     
     for permission in permissions:
         action, model = permission.codename.split("_", 1)
-        
+        if TRANSLATION_MODELS.get(model) is None:
+            print("No esta definido: ", model)
+            continue
+
         permission.spanish_name = (
             "Puede "
             f"{TRANSLATIONS.get(action)} "
@@ -46,7 +51,7 @@ def get_permissions():
         
         if app_name:
             grouped_permissions[app_name].append(permission)
-    
+    print(grouped_permissions)
     return grouped_permissions
 
 

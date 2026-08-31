@@ -11,5 +11,14 @@ class DashboardView(TemplateView):
         context.update(
             DashboardService.get_context()
         )
-
+        user = self.request.user
+        print("superuser:", user.is_superuser)
+        print("staff:", user.is_staff)
+        print("permiso directo:", user.user_permissions.filter(
+            codename="add_customuser"
+        ).exists())
+        print("permiso por grupo:", user.groups.filter(
+            permissions__codename="add_customuser"
+        ).exists())
+        print("permiso efectivo:", user.has_perm("accounts.add_customuser"))
         return context

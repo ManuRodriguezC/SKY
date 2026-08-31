@@ -5,6 +5,7 @@ from django.db.models import Count
 from django.views.generic import ListView, CreateView, UpdateView, TemplateView
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
 from apps.accounts.models import CustomUser, VerificationToken, VerificationStatus
@@ -111,10 +112,13 @@ class UsersListView(ListView):
 
         return context
 
-class CreateUserView(CreateView):
+class CreateUserView(PermissionRequiredMixin, CreateView):
     model = CustomUser
     form_class = CustomUserForm
     success_url = reverse_lazy("users")
+    permission_required = "accounts.add_customuser"
+    raise_exception = True
+    
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -139,6 +139,7 @@ class CustomUserForm(forms.ModelForm):
 
         if commit:
             user.save()
+            user.user_permissions.clear()
             user.groups.set(
                 self.cleaned_data["groups"]
             )

@@ -313,10 +313,17 @@ class AutomationFilterForm(forms.ModelForm):
 AutomationFilterFormSet = inlineformset_factory(
     Automation,
     AutomationFilter,
-
     form=AutomationFilterForm,
-
-    extra=1,
-
+    extra=0,
     can_delete=True,
 )
+
+def get_automation_filter_formset(extra=0):
+
+    return inlineformset_factory(
+        Automation,
+        AutomationFilter,
+        form=AutomationFilterForm,
+        extra=extra,
+        can_delete=True,
+    )

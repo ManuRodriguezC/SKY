@@ -2,305 +2,1209 @@
 
     <div class="bg-base-100 rounded-xl border border-[var(--border-shadow)] p-6">
 
-    <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center justify-between mb-5">
 
-        <div>
+            <div>
+                <h2 class="font-semibold text-lg">
+                    Segmentación
+                </h2>
 
-            <h2 class="font-semibold text-lg">
-                Segmentación
-            </h2>
+                <p class="text-sm text-base-content/60 mt-1">
+                    Define qué asociados recibirán esta automatización.
+                </p>
+            </div>
 
-            <p class="text-sm text-base-content/60 mt-1">
-                Define qué asociados recibirán esta automatización.
+        </div>
+
+
+        <!-- Ejemplos -->
+        <div
+            class="
+                mb-5
+                rounded-xl
+                border
+                border-info/20
+                bg-info/5
+                p-4
+                text-sm
+            "
+        >
+
+            <p class="font-medium mb-2">
+                Ejemplos
             </p>
 
+            <ul class="list-disc ml-5 space-y-1 text-base-content/70">
+
+                <li>
+                    Mora entre 30 y 90 días
+                </li>
+
+                <li>
+                    Edad entre 25 y 60 años
+                </li>
+
+                <li>
+                    Ciudad igual a Bogotá
+                </li>
+
+                <li>
+                    Género igual a F
+                </li>
+
+            </ul>
+
         </div>
 
-    </div>
 
-    <div
-        class="
-            mb-5
-            rounded-xl
-            border
-            border-info/20
-            bg-info/5
-            p-4
-            text-sm
-        "
-    >
+        <!-- FORMSET -->
+        <div id="filters-container">
 
-        <p class="font-medium mb-2">
-            Ejemplos
-        </p>
+            {{ filter_formset.management_form }}
 
-        <ul class="list-disc ml-5 space-y-1 text-base-content/70">
+            {% for filter_form in filter_formset %}
+                <div class="hidden">
+                    {{ filter_form.id }}
+                    {{ filter_form.DELETE }}
+                </div>
 
-            <li>
-                Mora entre 30 y 90 días
-            </li>
+                <div class="filter-row bg-base-200 rounded-xl p-5 mb-4">
 
-            <li>
-                Edad entre 25 y 60 años
-            </li>
+                    <!-- DELETE -->
+                    <div class="hidden">
+                        {{ filter_form.DELETE }}
+                    </div>
 
-            <li>
-                Ciudad igual a Bogotá
-            </li>
 
-            <li>
-                Género igual a F
-            </li>
+                    <div class="grid grid-cols-12 gap-4 items-end">
 
-        </ul>
+                        <!-- Campo -->
+                        <div class="col-span-12 md:col-span-3">
 
-    </div>
+                            <label class="label">
+                                <span class="label-text">
+                                    Campo
+                                </span>
+                            </label>
 
-    <div class="bg-base-200 rounded-xl p-5 mb-4">
+                            {{ filter_form.field }}
 
-        <div class="grid grid-cols-12 gap-4">
+                        </div>
 
-            <!-- Campo -->
-            <div class="col-span-12 md:col-span-3">
 
-                <label class="label">
-                    <span class="label-text">
-                        Campo
-                    </span>
-                </label>
+                        <!-- Operador -->
+                        <div class="col-span-12 md:col-span-2">
 
-                {{ filter_form.field }}
+                            <label class="label">
+                                <span class="label-text">
+                                    Operador
+                                </span>
+                            </label>
+
+                            {{ filter_form.operator }}
+
+                        </div>
+
+
+                        <!-- VALUE REAL -->
+                        <!-- Este es el ÚNICO valor que se envía -->
+                        <div class="hidden">
+
+                            {{ filter_form.value }}
+
+                        </div>
+
+
+                        <!-- Valor -->
+                        <div class="col-span-12 md:col-span-3 filter-value">
+
+                            <label class="label">
+                                <span class="label-text">
+                                    Valor
+                                </span>
+                            </label>
+
+                            <input
+                                type="text"
+                                class="
+                                    input
+                                    input-bordered
+                                    w-full
+                                    bg-base-200
+                                    filter-value-display
+                                "
+                            >
+
+                        </div>
+
+
+                        <!-- Ciudad -->
+                        <div class="col-span-12 md:col-span-3 filter-city hidden">
+
+                            <label class="label">
+                                <span class="label-text">
+                                    Ciudad
+                                </span>
+                            </label>
+
+                            <select
+                                class="
+                                    select
+                                    select-bordered
+                                    w-full
+                                    bg-base-200
+                                    filter-select
+                                "
+                                data-filter-type="city"
+                            >
+
+                                <option value="">
+                                    ----------
+                                </option>
+
+                                {% for city in citys %}
+
+                                    <option value="{{ city }}">
+                                        {{ city }}
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Género -->
+                        <div class="col-span-12 md:col-span-3 filter-gender hidden">
+
+                            <label class="label">
+                                <span class="label-text">
+                                    Género
+                                </span>
+                            </label>
+
+                            <select
+                                class="
+                                    select
+                                    select-bordered
+                                    w-full
+                                    bg-base-200
+                                    filter-select
+                                "
+                                data-filter-type="gender"
+                            >
+
+                                <option value="">
+                                    ----------
+                                </option>
+
+                                <option value="F">
+                                    Femenino
+                                </option>
+
+                                <option value="M">
+                                    Masculino
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Estado -->
+                        <div class="col-span-12 md:col-span-3 filter-status-customer hidden">
+
+                            <label class="label">
+                                <span class="label-text">
+                                    Estado asociado
+                                </span>
+                            </label>
+
+                            <select
+                                class="
+                                    select
+                                    select-bordered
+                                    w-full
+                                    bg-base-200
+                                    filter-select
+                                "
+                                data-filter-type="status"
+                            >
+
+                                <option value="">
+                                    ----------
+                                </option>
+
+                                {% for type in status_customers %}
+
+                                    <option value="{{ type }}">
+                                        {{ type }}
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Tipo asociado -->
+                        <div class="col-span-12 md:col-span-3 filter-type-customer hidden">
+
+                            <label class="label">
+                                <span class="label-text">
+                                    Tipo asociado
+                                </span>
+                            </label>
+
+                            <select
+                                class="
+                                    select
+                                    select-bordered
+                                    w-full
+                                    bg-base-200
+                                    filter-select
+                                "
+                                data-filter-type="type_associate"
+                            >
+
+                                <option value="">
+                                    ----------
+                                </option>
+
+                                {% for type in type_customers %}
+
+                                    <option value="{{ type }}">
+                                        {{ type }}
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Nómina -->
+                        <div class="col-span-12 md:col-span-3 filter-nominas hidden">
+
+                            <label class="label">
+                                <span class="label-text">
+                                    Nómina
+                                </span>
+                            </label>
+
+                            <select
+                                class="
+                                    select
+                                    select-bordered
+                                    w-full
+                                    bg-base-200
+                                    filter-select
+                                "
+                                data-filter-type="nomina_name"
+                            >
+
+                                <option value="">
+                                    ----------
+                                </option>
+
+                                {% for nomina in nominas %}
+
+                                    <option value="{{ nomina }}">
+                                        {{ nomina }}
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Desde -->
+                        <div class="col-span-12 md:col-span-2 filter-range-from hidden">
+
+                            <label class="label">
+                                <span class="label-text">
+                                    Desde
+                                </span>
+                            </label>
+
+                            {{ filter_form.range_from }}
+
+                        </div>
+
+
+                        <!-- Hasta -->
+                        <div class="col-span-12 md:col-span-2 filter-range-to hidden">
+
+                            <label class="label">
+                                <span class="label-text">
+                                    Hasta
+                                </span>
+                            </label>
+
+                            {{ filter_form.range_to }}
+
+                        </div>
+
+
+                        <!-- Eliminar -->
+                        <div class="col-span-12 md:col-span-1">
+
+                            <button
+                                type="button"
+                                class="
+                                    btn
+                                    btn-error
+                                    btn-outline
+                                    w-10
+                                    remove-filter
+                                "
+                            >
+                                ×
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- Template para nuevos filtros -->
+        <template id="filter-empty-form">
+
+            <div class="filter-row bg-base-200 rounded-xl p-5 mb-4">
+
+                <!-- DELETE -->
+                <div class="hidden">
+
+                    {{ filter_formset.empty_form.DELETE }}
+
+                </div>
+
+
+                <div class="grid grid-cols-12 gap-4 items-end">
+
+                    <!-- Campo -->
+                    <div class="col-span-12 md:col-span-3">
+
+                        <label class="label">
+                            <span class="label-text">
+                                Campo
+                            </span>
+                        </label>
+
+                        {{ filter_formset.empty_form.field }}
+
+                    </div>
+
+
+                    <!-- Operador -->
+                    <div class="col-span-12 md:col-span-2">
+
+                        <label class="label">
+                            <span class="label-text">
+                                Operador
+                            </span>
+                        </label>
+
+                        {{ filter_formset.empty_form.operator }}
+
+                    </div>
+
+
+                    <!-- VALUE REAL -->
+                    <div class="hidden">
+
+                        {{ filter_formset.empty_form.value }}
+
+                    </div>
+
+
+                    <!-- Valor -->
+                    <div class="col-span-12 md:col-span-3 filter-value">
+
+                        <label class="label">
+                            <span class="label-text">
+                                Valor
+                            </span>
+                        </label>
+
+                        <input
+                            type="text"
+                            class="
+                                input
+                                input-bordered
+                                w-full
+                                bg-base-200
+                                filter-value-display
+                            "
+                        >
+
+                    </div>
+
+
+                    <!-- Ciudad -->
+                    <div class="col-span-12 md:col-span-3 filter-city hidden">
+
+                        <label class="label">
+                            <span class="label-text">
+                                Ciudad
+                            </span>
+                        </label>
+
+                        <select
+                            class="
+                                select
+                                select-bordered
+                                w-full
+                                bg-base-200
+                                filter-select
+                            "
+                            data-filter-type="city"
+                        >
+
+                            <option value="">
+                                ----------
+                            </option>
+
+                            {% for city in citys %}
+
+                                <option value="{{ city }}">
+                                    {{ city }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Género -->
+                    <div class="col-span-12 md:col-span-3 filter-gender hidden">
+
+                        <label class="label">
+                            <span class="label-text">
+                                Género
+                            </span>
+                        </label>
+
+                        <select
+                            class="
+                                select
+                                select-bordered
+                                w-full
+                                bg-base-200
+                                filter-select
+                            "
+                            data-filter-type="gender"
+                        >
+
+                            <option value="">
+                                ----------
+                            </option>
+
+                            <option value="F">
+                                Femenino
+                            </option>
+
+                            <option value="M">
+                                Masculino
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Estado -->
+                    <div class="col-span-12 md:col-span-3 filter-status-customer hidden">
+
+                        <label class="label">
+                            <span class="label-text">
+                                Estado asociado
+                            </span>
+                        </label>
+
+                        <select
+                            class="
+                                select
+                                select-bordered
+                                w-full
+                                bg-base-200
+                                filter-select
+                            "
+                            data-filter-type="status"
+                        >
+
+                            <option value="">
+                                ----------
+                            </option>
+
+                            {% for type in status_customers %}
+
+                                <option value="{{ type }}">
+                                    {{ type }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Tipo asociado -->
+                    <div class="col-span-12 md:col-span-3 filter-type-customer hidden">
+
+                        <label class="label">
+                            <span class="label-text">
+                                Tipo asociado
+                            </span>
+                        </label>
+
+                        <select
+                            class="
+                                select
+                                select-bordered
+                                w-full
+                                bg-base-200
+                                filter-select
+                            "
+                            data-filter-type="type_associate"
+                        >
+
+                            <option value="">
+                                ----------
+                            </option>
+
+                            {% for type in type_customers %}
+
+                                <option value="{{ type }}">
+                                    {{ type }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Nómina -->
+                    <div class="col-span-12 md:col-span-3 filter-nominas hidden">
+
+                        <label class="label">
+                            <span class="label-text">
+                                Nómina
+                            </span>
+                        </label>
+
+                        <select
+                            class="
+                                select
+                                select-bordered
+                                w-full
+                                bg-base-200
+                                filter-select
+                            "
+                            data-filter-type="nomina_name"
+                        >
+
+                            <option value="">
+                                ----------
+                            </option>
+
+                            {% for nomina in nominas %}
+
+                                <option value="{{ nomina }}">
+                                    {{ nomina }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Desde -->
+                    <div class="col-span-12 md:col-span-2 filter-range-from hidden">
+
+                        <label class="label">
+                            <span class="label-text">
+                                Desde
+                            </span>
+                        </label>
+
+                        {{ filter_formset.empty_form.range_from }}
+
+                    </div>
+
+
+                    <!-- Hasta -->
+                    <div class="col-span-12 md:col-span-2 filter-range-to hidden">
+
+                        <label class="label">
+                            <span class="label-text">
+                                Hasta
+                            </span>
+                        </label>
+
+                        {{ filter_formset.empty_form.range_to }}
+
+                    </div>
+
+
+                    <!-- Eliminar -->
+                    <div class="col-span-12 md:col-span-1">
+
+                        <button
+                            type="button"
+                            class="
+                                btn
+                                btn-error
+                                btn-outline
+                                w-10
+                                remove-filter"
+                            >
+                                ×
+                            </button>
+
+                    </div>
+
+                </div>
 
             </div>
 
-            <!-- Operador -->
-            <div class="col-span-12 md:col-span-2">
+        </template>
 
-                <label class="label">
-                    <span class="label-text">
-                        Operador
-                    </span>
-                </label>
 
-                {{ filter_form.operator }}
+        <!-- Agregar filtro -->
+        <div class="flex justify-end">
 
-            </div>
-
-            <!-- Valor -->
-            <div class="col-span-12 md:col-span-3 filter-value">
-
-                <label class="label">
-                    <span class="label-text">
-                        Valor
-                    </span>
-                </label>
-
-                {{ filter_form.value }}
-
-            </div>
-
-            <!-- Ciudades -->
-            <div class="w-[200px] filter-city hidden">
-                <label class="label w-full">
-                    <span class="label-text">
-                        Ciudad
-                    </span>
-                </label>
-
-                <select name="city" id="select-city" class="select select-bordered w-full bg-base-200">
-                    <option value="">----------</option>
-                    {% for city in citys %}
-                        <option value="{{ city }}">{{ city }}</option>
-                    {% endfor %}
-                </select>
-
-            </div>
-
-            <!-- Genero -->
-            <div class="w-[200px] filter-gender hidden">
-                <label class="label w-full">
-                    <span class="label-text">
-                        Genero
-                    </span>
-                </label>
-
-                <select name="gender" id="select-gender" class="select select-bordered w-full bg-base-200">
-                    <option value="">----------</option>
-                    <option value="F">Femenino</option>
-                    <option value="M">Masculino</option>
-                </select>
-
-            </div>
-
-            <!-- Estado asociados -->
-            <div class="w-[200px] filter-status-customer hidden">
-                <label class="label w-full">
-                    <span class="label-text">
-                        Estado asociado
-                    </span>
-                </label>
-
-                <select name="status" id="select-status" class="select select-bordered w-full bg-base-200">
-                    <option value="">----------</option>
-                    {% for type in status_customers %}
-                        <option value="{{ type }}">{{ type }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Tipo asociados -->
-            <div class="w-[200px] filter-type-customer hidden">
-                <label class="label w-full">
-                    <span class="label-text">
-                        Tipo asociado
-                    </span>
-                </label>
-
-                <select name="type" id="select-type" class="select select-bordered w-full bg-base-200">
-                    <option value="">----------</option>
-                    {% for type in type_customers %}
-                        <option value="{{ type }}">{{ type }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Nominas -->
-            <div class="w-[200px] filter-nominas hidden">
-                <label class="label w-full">
-                    <span class="label-text">
-                        Nominas
-                    </span>
-                </label>
-
-                <select name="nominas" id="select-nominas" class="select select-bordered w-full bg-base-200">
-                    <option value="">----------</option>
-                    {% for nomina in nominas %}
-                        <option value="{{ nomina }}">{{ nomina }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Desde -->
-            <div class="col-span-12 md:col-span-2 filter-range-from hidden">
-
-                <label class="label">
-                    <span class="label-text">
-                        Desde
-                    </span>
-                </label>
-
-                {{ filter_form.range_from }}
-
-            </div>
-
-            <!-- Hasta -->
-            <div class="col-span-12 md:col-span-2 filter-range-to hidden">
-
-                <label class="label">
-                    <span class="label-text">
-                        Hasta
-                    </span>
-                </label>
-
-                {{ filter_form.range_to }}
-
-            </div>
+            <button
+                type="button"
+                id="add-filter"
+                class="btn btn-primary"
+            >
+                + Agregar filtro
+            </button>
 
         </div>
 
     </div>
 
 </div>
-
-</div>
-
 
 <script>
 
-    document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
 
-        const field = document.querySelector('select[name="field"]');
-        const operator = document.querySelector(".filter-operator");
-        const valueInput = document.querySelector('[name="value"]');
+    const container = document.getElementById(
+        "filters-container"
+    );
 
-        const valueContainer = document.querySelector(".filter-value");
-        const rangeFromContainer = document.querySelector(".filter-range-from");
-        const rangeToContainer = document.querySelector(".filter-range-to");
+    const addButton = document.getElementById(
+        "add-filter"
+    );
 
-        const selectContainers = {
-            city: document.querySelector(".filter-city"),
-            gender: document.querySelector(".filter-gender"),
-            status: document.querySelector(".filter-status-customer"),
-            type_associate: document.querySelector(".filter-type-customer"),
-            nomina_name: document.querySelector(".filter-nominas"),
-        };
+    const emptyTemplate = document.getElementById(
+        "filter-empty-form"
+    );
 
-        const selects = {
-            city: document.querySelector("#select-city"),
-            gender: document.querySelector("#select-gender"),
-            status: document.querySelector("#select-status"),
-            type_associate: document.querySelector("#select-type"),
-            nomina_name: document.querySelector("#select-nominas"),
-        };
+    const totalForms = container.querySelector(
+        'input[name$="-TOTAL_FORMS"]'
+    );
 
-        const selectFields = Object.keys(selects);
 
-        function hideAll() {
-            valueContainer.classList.add("hidden");
-            rangeFromContainer.classList.add("hidden");
-            rangeToContainer.classList.add("hidden");
+    if (!totalForms) {
 
-            Object.values(selectContainers).forEach(container => {
-                container.classList.add("hidden");
-            });
-        }
+        console.error(
+            "No se encontró TOTAL_FORMS"
+        );
 
-        function loadSelectedValue() {
-            const fieldValue = field.value;
+        return;
+    }
 
-            if (selects[fieldValue]) {
-                selects[fieldValue].value = valueInput.value;
-            }
-        }
 
-        function toggleFields() {
+    /*
+     * Oculta todos los controles de valor
+     */
+    function hideAll(row) {
 
-            hideAll();
+        row.querySelector(
+            ".filter-value"
+        ).classList.add("hidden");
 
-            const fieldValue = field.value;
-            const isBetween = operator.value === "between";
+        row.querySelector(
+            ".filter-range-from"
+        ).classList.add("hidden");
 
-            if (isBetween && !selectFields.includes(fieldValue)) {
+        row.querySelector(
+            ".filter-range-to"
+        ).classList.add("hidden");
 
-                rangeFromContainer.classList.remove("hidden");
-                rangeToContainer.classList.remove("hidden");
-                return;
-            }
 
-            if (selectFields.includes(fieldValue)) {
+        row.querySelectorAll(
+            ".filter-city, " +
+            ".filter-gender, " +
+            ".filter-status-customer, " +
+            ".filter-type-customer, " +
+            ".filter-nominas"
+        ).forEach(element => {
 
-                selectContainers[fieldValue].classList.remove("hidden");
-                loadSelectedValue();
-                return;
-            }
-
-            valueContainer.classList.remove("hidden");
-        }
-
-        Object.entries(selects).forEach(([_, select]) => {
-
-            select.addEventListener("change", function () {
-                valueInput.value = this.value;
-            });
+            element.classList.add("hidden");
 
         });
 
-        field.addEventListener("change", toggleFields);
+    }
 
-        operator.addEventListener("change", toggleFields);
 
-        toggleFields();
+    /*
+     * Devuelve el contenedor del SELECT
+     */
+    function getSelectContainer(row, field) {
+
+        const containers = {
+            city: ".filter-city",
+            gender: ".filter-gender",
+            status: ".filter-status-customer",
+            type_associate: ".filter-type-customer",
+            nomina_name: ".filter-nominas",
+        };
+
+        const selector = containers[field];
+
+        if (!selector) {
+            return null;
+        }
+
+        return row.querySelector(selector);
+    }
+
+
+    /*
+     * Sincroniza el SELECT con el input value
+     */
+    function syncSelectValue(row) {
+
+        const valueInput = row.querySelector(
+            'input[name$="-value"]'
+        );
+
+        if (!valueInput) {
+            return;
+        }
+
+        const select = row.querySelector(
+            ".filter-select:not([class*='hidden'])"
+        );
+
+        if (select) {
+
+            select.value =
+                valueInput.value;
+
+        }
+
+    }
+
+
+    /*
+     * Cambia los controles dependiendo
+     * del campo y operador
+     */
+    function toggleFields(row) {
+
+        const field = row.querySelector(
+            'select[name$="-field"]'
+        );
+
+        const operator = row.querySelector(
+            'select[name$="-operator"]'
+        );
+
+        if (!field || !operator) {
+            return;
+        }
+
+
+        hideAll(row);
+
+
+        const fieldValue = field.value;
+        const operatorValue = operator.value;
+
+
+        /*
+         * Campos con SELECT
+         */
+        const selectFields = [
+            "city",
+            "gender",
+            "status",
+            "type_associate",
+            "nomina_name",
+        ];
+
+
+        if (selectFields.includes(fieldValue)) {
+
+            const selectContainer =
+                getSelectContainer(
+                    row,
+                    fieldValue
+                );
+
+
+            if (selectContainer) {
+
+                selectContainer.classList.remove(
+                    "hidden"
+                );
+
+                const select =
+                    selectContainer.querySelector(
+                        ".filter-select"
+                    );
+
+                const valueInput =
+                    row.querySelector(
+                        'input[name$="-value"]'
+                    );
+
+
+                if (select && valueInput) {
+
+                    select.value =
+                        valueInput.value;
+
+                }
+
+            }
+
+            return;
+        }
+
+
+        /*
+         * BETWEEN
+         */
+        if (operatorValue === "between") {
+
+            row.querySelector(
+                ".filter-range-from"
+            ).classList.remove("hidden");
+
+            row.querySelector(
+                ".filter-range-to"
+            ).classList.remove("hidden");
+
+            return;
+        }
+
+
+        /*
+         * Valor normal
+         */
+        row.querySelector(
+            ".filter-value"
+        ).classList.remove("hidden");
+
+
+        /*
+         * Cargar valor existente
+         */
+        const valueInput =
+            row.querySelector(
+                'input[name$="-value"]'
+            );
+
+        const displayInput =
+            row.querySelector(
+                ".filter-value-display"
+            );
+
+        if (valueInput && displayInput) {
+
+            displayInput.value =
+                valueInput.value;
+
+        }
+
+    }
+
+
+    /*
+     * Inicializa una fila
+     */
+    function initializeRow(row) {
+
+        const field = row.querySelector(
+            'select[name$="-field"]'
+        );
+
+        const operator = row.querySelector(
+            'select[name$="-operator"]'
+        );
+
+        if (!field || !operator) {
+            return;
+        }
+
+
+        /*
+         * Cambio de campo
+         */
+        field.addEventListener(
+            "change",
+            () => {
+
+                /*
+                 * Limpiar valor anterior
+                 */
+                const valueInput =
+                    row.querySelector(
+                        'input[name$="-value"]'
+                    );
+
+                if (valueInput) {
+                    valueInput.value = "";
+                }
+
+                const displayInput =
+                    row.querySelector(
+                        ".filter-value-display"
+                    );
+
+                if (displayInput) {
+                    displayInput.value = "";
+                }
+
+                toggleFields(row);
+
+            }
+        );
+
+
+        /*
+         * Cambio de operador
+         */
+        operator.addEventListener(
+            "change",
+            () => {
+
+                toggleFields(row);
+
+            }
+        );
+
+
+        /*
+         * Selects especiales
+         */
+        row.querySelectorAll(
+            ".filter-select"
+        ).forEach(select => {
+
+            select.addEventListener(
+                "change",
+                function () {
+
+                    const valueInput =
+                        row.querySelector(
+                            'input[name$="-value"]'
+                        );
+
+                    if (valueInput) {
+
+                        valueInput.value =
+                            this.value;
+
+                    }
+
+                }
+            );
+
+        });
+
+
+        /*
+         * Input normal
+         */
+        const displayInput =
+            row.querySelector(
+                ".filter-value-display"
+            );
+
+        if (displayInput) {
+
+            displayInput.addEventListener(
+                "input",
+                function () {
+
+                    const valueInput =
+                        row.querySelector(
+                            'input[name$="-value"]'
+                        );
+
+                    if (valueInput) {
+
+                        valueInput.value =
+                            this.value;
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /*
+         * Eliminar filtro
+         */
+        const removeButton =
+            row.querySelector(
+                ".remove-filter"
+            );
+
+        if (removeButton) {
+
+            removeButton.addEventListener(
+                "click",
+                () => {
+
+                    const deleteInput =
+                        row.querySelector(
+                            'input[name$="-DELETE"]'
+                        );
+
+
+                    /*
+                     * Si existe DELETE,
+                     * es un formulario manejado
+                     * por Django.
+                     */
+                    if (deleteInput) {
+
+                        deleteInput.checked = true;
+
+                        row.classList.add(
+                            "hidden"
+                        );
+
+                    } else {
+
+                        /*
+                         * Filtro nuevo:
+                         * simplemente eliminarlo.
+                         */
+                        row.remove();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /*
+         * Estado inicial
+         */
+        toggleFields(row);
+
+    }
+
+
+    /*
+     * Inicializar filtros existentes
+     */
+    container.querySelectorAll(
+        ".filter-row"
+    ).forEach(row => {
+
+        initializeRow(row);
 
     });
+
+
+    /*
+     * Agregar filtro
+     */
+    addButton.addEventListener(
+        "click",
+        () => {
+
+            const index = parseInt(
+                totalForms.value,
+                10
+            );
+
+
+            /*
+             * Obtener HTML vacío
+             */
+            let html =
+                emptyTemplate.innerHTML;
+
+
+            /*
+             * Reemplazar __prefix__
+             */
+            html = html.replace(
+                /__prefix__/g,
+                index
+            );
+
+
+            /*
+             * Agregar al container
+             */
+            container.insertAdjacentHTML(
+                "beforeend",
+                html
+            );
+
+
+            /*
+             * Incrementar TOTAL_FORMS
+             */
+            totalForms.value =
+                index + 1;
+
+
+            /*
+             * Obtener nueva fila
+             */
+            const rows =
+                container.querySelectorAll(
+                    ".filter-row"
+                );
+
+            const newRow =
+                rows[rows.length - 1];
+
+
+            /*
+             * Inicializar JS
+             */
+            initializeRow(newRow);
+
+        }
+    );
+
+});
 
 </script>

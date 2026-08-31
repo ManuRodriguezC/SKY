@@ -39,8 +39,10 @@
 
                 {% include 'configurator/search_button.html' %}
 
-                {% url 'create-user' as add_url %}
-                {% include 'configurator/add_button.html' with add_url=add_url message="Nuevo usuario" %}
+                {% if perms.accounts.add_customuser %}
+                    {% url 'create-user' as add_url %}
+                    {% include 'configurator/add_button.html' with add_url=add_url message="Nuevo usuario" %}
+                {% endif %}
             </form>
         </div>
 

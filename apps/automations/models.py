@@ -294,10 +294,10 @@ class FilterOperator(models.TextChoices):
 
 class AutomationFilter(models.Model):
 
-    automation = models.OneToOneField(
+    automation = models.ForeignKey(
         Automation,
         on_delete=models.CASCADE,
-        related_name="filters_auto"
+        related_name="filters"
     )
 
     field = models.CharField(

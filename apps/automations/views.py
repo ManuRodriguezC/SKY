@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.contrib import messages
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -6,7 +7,7 @@ from django.db.models import Q
 
 from .forms import (
     AutomationForm,
-    AutomationFilterForm,
+    get_automation_filter_formset
 )
 
 from .models import Automation, AutomationLog, AutomationExecution
@@ -75,17 +76,20 @@ class AutomationCreateView(CreateView):
 
         if self.request.POST:
 
-            context["filter_form"] = (
-                AutomationFilterForm(
+            context["filter_formset"] = (
+                get_automation_filter_formset(1)(
                     self.request.POST,
-                    self.request.FILES
+                    self.request.FILES,
+                    prefix="filters"
                 )
             )
 
         else:
 
-            context["filter_form"] = (
-                AutomationFilterForm()
+            context["filter_formset"] = (
+                get_automation_filter_formset(1)(
+                    prefix="filters"
+                )
             )
 
         context.update({
@@ -100,38 +104,32 @@ class AutomationCreateView(CreateView):
         return context
 
     def form_valid(self, form):
+        filter_formset = get_automation_filter_formset(1)
 
-        context = self.get_context_data()
+        filter_formset = filter_formset(
+            self.request.POST,
+            self.request.FILES,
+            prefix="filters"
+        )
 
-        filter_form = context[
-            "filter_form"
-        ]
-
-        if not filter_form.is_valid():
+        if not filter_formset.is_valid():
 
             return self.form_invalid(
                 form
             )
 
-        self.object = form.save()
+        with transaction.atomic():
+            self.object = form.save()
 
-        automation_filter = (
-            filter_form.save(
-                commit=False
+            filter_formset.instance = self.object
+
+            filter_formset.save()
+
+            AutomationLog.create_log(
+                automation=self.object,
+                action=AutomationLog.Action.CREATED,
+                user=self.request.user,
             )
-        )
-
-        automation_filter.automation = (
-            self.object
-        )
-
-        automation_filter.save()
-        
-        AutomationLog.create_log(
-            automation=self.object,
-            action=AutomationLog.Action.CREATED,
-            user=self.request.user,
-        )
 
         return redirect(
             self.get_success_url()
@@ -154,27 +152,25 @@ class AutomationUpdateView(UpdateView):
 
         context = super().get_context_data(**kwargs)
 
-        filter_instance = getattr(
-            self.object,
-            "filters_auto",
-            None
-        )
-
         if self.request.POST:
-            context["filter_form"] = (
-                AutomationFilterForm(
+
+            context["filter_formset"] = (
+                get_automation_filter_formset(0)(
                     self.request.POST,
-                    instance=filter_instance
+                    self.request.FILES,
+                    instance=self.object,
+                    prefix="filters",
                 )
             )
 
         else:
-            context["filter_form"] = (
-                AutomationFilterForm(
-                    instance=filter_instance
+
+            context["filter_formset"] = (
+                get_automation_filter_formset(0)(
+                    instance=self.object,
+                    prefix="filters",
                 )
             )
-            
 
         context.update({
             "title": "Actualizar automatización",
@@ -182,53 +178,46 @@ class AutomationUpdateView(UpdateView):
             "citys": get_citys(),
             "genders": get_gender(),
             "status_customers": get_status_customers(),
-            "nominas": get_nominas()
+            "nominas": get_nominas(),
         })
-        
+
         return context
 
     def form_valid(self, form):
-        automation = self.get_object()
 
-        context = self.get_context_data()
+        filter_formset = get_automation_filter_formset()(
+            self.request.POST,
+            self.request.FILES,
+            instance=self.object,
+            prefix="filters",
+        )
 
-        filter_form = context["filter_form"]
+        if not filter_formset.is_valid():
 
-        if not filter_form.is_valid():
             return self.form_invalid(form)
 
-        automation_filter = getattr(
-            automation,
-            "filters_auto",
-            None
-        )
+        with transaction.atomic():
 
-        changes = self._get_changes(
-            automation=automation,
-            automation_filter=automation_filter,
-            form=form,
-            filter_form=filter_form,
-        )
-
-        self.object = form.save()
-
-        automation_filter = filter_form.save(
-                commit=False
-            )
-
-        automation_filter.automation = (
-            self.object
-        )
-
-        automation_filter.save()
-        
-        if changes:
-            AutomationLog.create_log(
+            changes = self._get_changes(
                 automation=self.object,
-                action=AutomationLog.Action.UPDATED,
-                user=self.request.user,
-                detail="\n".join(changes),
+                form=form,
+                filter_formset=filter_formset,
             )
+
+            self.object = form.save()
+
+            filter_formset.instance = self.object
+
+            filter_formset.save()
+
+            if changes:
+
+                AutomationLog.create_log(
+                    automation=self.object,
+                    action=AutomationLog.Action.UPDATED,
+                    user=self.request.user,
+                    detail="\n".join(changes),
+                )
 
         return redirect(
             self.get_success_url()
@@ -237,14 +226,18 @@ class AutomationUpdateView(UpdateView):
     def _get_changes(
         self,
         automation,
-        automation_filter,
         form,
-        filter_form,
+        filter_formset,
     ):
+
         changes = []
 
+        # Cambios de la automatización
         for field in form.changed_data:
-            model_field = automation._meta.get_field(field)
+
+            model_field = automation._meta.get_field(
+                field
+            )
 
             changes.append(
                 f"{model_field.verbose_name}: "
@@ -252,14 +245,56 @@ class AutomationUpdateView(UpdateView):
                 f"'{form.cleaned_data[field]}'"
             )
 
-        if automation_filter:
+        # Cambios de los filtros
+        for filter_form in filter_formset:
+
+            # Filtro eliminado
+            if (
+                filter_form.is_valid()
+                and filter_form.cleaned_data.get("DELETE")
+            ):
+
+                if filter_form.instance.pk:
+
+                    changes.append(
+                        f"Se eliminó el filtro: "
+                        f"{filter_form.instance}"
+                    )
+
+                continue
+
+            # Filtro nuevo
+            if not filter_form.instance.pk:
+
+                if filter_form.has_changed():
+
+                    changes.append(
+                        "Se agregó un nuevo filtro."
+                    )
+
+                continue
+
+            # Filtro existente modificado
             for field in filter_form.changed_data:
-                model_field = automation_filter._meta.get_field(field)
+
+                model_field = (
+                    filter_form.instance
+                    ._meta
+                    .get_field(field)
+                )
+
+                old_value = getattr(
+                    filter_form.instance,
+                    field
+                )
+
+                new_value = filter_form.cleaned_data[
+                    field
+                ]
 
                 changes.append(
                     f"{model_field.verbose_name}: "
-                    f"'{getattr(automation_filter, field)}' → "
-                    f"'{filter_form.cleaned_data[field]}'"
+                    f"'{old_value}' → '{new_value}'"
                 )
 
         return changes

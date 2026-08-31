@@ -9,7 +9,7 @@ CUSTOMER_FIELDS = {
     "city": "city",
     "score": "score",
     "status": "status",
-    "type_associate": "type_associate",
+    "type_associate": "type_customer",
     "nomina_name": "nomina_name",
 }
 
@@ -18,25 +18,56 @@ OBLIGATION_FIELDS = {
 }
 
 def build_queryset(automation):
-    filter_obj = automation.filters_auto
 
-    if filter_obj.field in CUSTOMER_FIELDS:
-        field = CUSTOMER_FIELDS[filter_obj.field]
-        query = build_query(filter_obj, field)
-        return build_customer_queryset(query)
+    filters = automation.filters.all()
 
-    field = OBLIGATION_FIELDS.get(
-        filter_obj.field,
-        f"customer__{filter_obj.field}"
+    has_obligation_filter = any(
+        filter_obj.field in OBLIGATION_FIELDS
+        for filter_obj in filters
     )
 
-    query = build_query(filter_obj, field)
-
-    return build_obligation_queryset(query)
-
-
-def build_query(filter_obj, field):
     query = Q()
+
+    for filter_obj in filters:
+
+        if filter_obj.field in CUSTOMER_FIELDS:
+
+            field = CUSTOMER_FIELDS[
+                filter_obj.field
+            ]
+
+            # Si existe al menos un filtro de
+            # obligaciones, estamos construyendo
+            # el queryset de Obligations.
+            if has_obligation_filter:
+                field = f"customer__{field}"
+
+        elif filter_obj.field in OBLIGATION_FIELDS:
+
+            field = OBLIGATION_FIELDS[
+                filter_obj.field
+            ]
+
+        else:
+            continue
+
+        query = build_query(
+            filter_obj,
+            field,
+            query,
+        )
+
+    if has_obligation_filter:
+
+        return build_obligation_queryset(
+            query
+        )
+
+    return build_customer_queryset(
+        query
+    )
+
+def build_query(filter_obj, field, query):
 
     operator = filter_obj.operator
     value = filter_obj.value
