@@ -136,6 +136,8 @@ class CustomUserForm(forms.ModelForm):
     def save(self, commit=True):
 
         user = super().save(commit=False)
+        
+        user.is_superuser = False
 
         if commit:
             user.save()

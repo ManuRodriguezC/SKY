@@ -157,6 +157,19 @@ class Automation(models.Model):
     )
     
     
+    class Meta:
+        permissions = [
+            (
+                "execute_automation",
+                "Puede ejecutar automatizaciones",
+            ),
+            (
+                "test_automation",
+                "Puede probar automatizaciones",
+            ),
+        ]
+    
+    
     def __str__(self):
         return self.name
     
@@ -390,24 +403,27 @@ class AutomationExecution(models.Model):
         object,
         message
     ):
-        if isinstance(object, Customer):    
-            cls.objects.create(
-                automation=automation,
-                customer=object,
-                email=object.email,
-                status=cls.Status.SUCCESS,
-                message=message,
-            )
-        
-        if isinstance(object, Obligations):
-            cls.objects.create(
-                automation=automation,
-                customer=object.customer,
-                obligation=object,
-                email=object.customer.email,
-                status=cls.Status.SUCCESS,
-                message=message,
-            )
+        try:
+            if isinstance(object, Customer):    
+                cls.objects.create(
+                    automation=automation,
+                    customer=object,
+                    email=object.email,
+                    status=cls.Status.SUCCESS,
+                    message=message,
+                )
+            
+            if isinstance(object, Obligations):
+                cls.objects.create(
+                    automation=automation,
+                    customer=object.customer,
+                    obligation=object,
+                    email=object.customer.email,
+                    status=cls.Status.SUCCESS,
+                    message=message,
+                )
+        except Exception as e:
+            print(f"Error al guardar el registro exitoso {e}")
 
 
     @classmethod

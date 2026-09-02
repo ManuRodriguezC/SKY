@@ -246,7 +246,7 @@
                         <!-- ACTIONS -->
                         <td class="flex flex-row gap-2 justify-center items-center px-6 py-4 border-t border-[var(--border-color)]">
 
-                            {% if user.is_active%}
+                            {% if user.is_active and pers.accounts.change_customuser %}
                                 <div class="flex justify-end gap-2">
 
                                     {% url 'edit-user' user.id as url_edit %}
@@ -256,7 +256,7 @@
                                 </div>
                             {% endif %}
                             
-                            {% if not user.is_staff %}
+                            {% if perms.accounts.change_customuser %}
                                 <button class="
                                         w-7 h-7
                                         rounded-lg

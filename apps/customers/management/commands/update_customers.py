@@ -44,25 +44,28 @@ class Command(BaseCommand):
 
             city = row["AP - Nombre Ciudad Dir."]
             city = city.strip().title() if pd.notna(city) else None
-            
 
-            customer, created = Customer.objects.update_or_create(
-                document=document,
-                defaults={
-                    "first_name": row["AP - Nombre"],
-                    "last_name": row["AP - Nombre"],
-                    "email": row["AP - Dirección Electrónica"],
-                    "status": row["AP - Estado como Asociado"],
-                    "type_customer": row["AP - Nombre Tipo Asociado"],
-                    "nomina_name": row["AP - Nombre Nomina Asoc."],
-                    "age": row["AP - Edad"],
-                    "gender": row["AP - Sexo"],
-                    "phone": row["AP - Teléfono celular"],
-                    "score": row["CA - Calificación Crédito"],
-                    "city": city,
-                    "contributions": row[""]
-                }
-            )
+            try:
+                customer, created = Customer.objects.update_or_create(
+                    document=document,
+                    defaults={
+                        "first_name": self.clean_value(row["AP - Nombre"]),
+                        "last_name": self.clean_value(row["AP - Apellido"]),
+                        "email": self.clean_value(row["AP - Dirección Electrónica"]),
+                        "status": self.clean_value(row["AP - Estado como Asociado"]),
+                        "type_customer": self.clean_value(row["AP - Nombre Tipo Asociado"]),
+                        "nomina_name": self.clean_value(row["AP - Nombre Nomina Asoc."]),
+                        "age": self.clean_value(row["AP - Edad"]),
+                        "gender": self.clean_value(row["AP - Sexo"]),
+                        "phone": self.clean_value(row["AP - Teléfono celular"]),
+                        "score": self.clean_value(row["CA - Calificación Crédito"]),
+                        "city": city,
+                        "contributions": self.clean_value(row["AP - Total Aportes"]),
+                    }
+                )
+            except Exception as e:
+                print(f"Error creating/updating customer. Document: {document}. Error: {e}")
+                continue
 
             if created:
                 created_customers += 1
@@ -79,36 +82,43 @@ class Command(BaseCommand):
                     description="Asociado actualizado mediante importación de Excel."
                 )
 
-            obligation, created = Obligations.objects.update_or_create(
-                customer=customer,
-                num_obligacion=row["CA - Número de Obligación"],
-                defaults={
-                    "credit_line": row["CA - Nombre Línea del Crédito"],
-                    "mora_days": row["CA - Días vencidos"],
-                    "total": row["TOTAL DE DEUDA"],
-                }
-            )
+            try:
+                obligation, created = Obligations.objects.update_or_create(
+                    customer=customer,
+                    num_obligacion=self.clean_value(row["CA - Número de Obligación"]),
+                    defaults={
+                        "credit_line": self.clean_value(row["CA - Nombre Línea del Crédito"]),
+                        "mora_days": self.clean_value(row["CA - Días vencidos"]),
+                        "total": self.clean_value(row["TOTAL DE DEUDA"]),
+                    }
+                )
+                
+                if created:
+                    created_obligations += 1
+                    CustomerLog.objects.create(
+                        customer=customer,
+                        action=CustomerLog.Action.OBLIGATION_CREATED,
+                        description=(
+                            f"Se registró la obligación "
+                            f"{obligation.num_obligacion}."
+                        )
+                    )
+                else:
+                    updated_obligations += 1
+                    CustomerLog.objects.create(
+                        customer=customer,
+                        action=CustomerLog.Action.OBLIGATION_UPDATED,
+                        description=(
+                            f"Se actualizo la obligación "
+                            f"{obligation.num_obligacion}."
+                        )
+                    )
 
-            if created:
-                created_obligations += 1
-                CustomerLog.objects.create(
-                    customer=customer,
-                    action=CustomerLog.Action.OBLIGATION_CREATED,
-                    description=(
-                        f"Se registró la obligación "
-                        f"{obligation.num_obligacion}."
-                    )
-                )
-            else:
-                updated_obligations += 1
-                CustomerLog.objects.create(
-                    customer=customer,
-                    action=CustomerLog.Action.OBLIGATION_UPDATED,
-                    description=(
-                        f"Se actualizo la obligación "
-                        f"{obligation.num_obligacion}."
-                    )
-                )
+                
+            except Exception as e:
+                print(f"Error creating/updating customer. Obligation Error: {e}")
+                continue
+
 
         self.stdout.write(
             self.style.SUCCESS(
@@ -120,3 +130,6 @@ Obligaciones actualizadas: {updated_obligations}
                 """
             )
         )
+    
+    def clean_value(self, value):
+        return None if pd.isna(value) else value

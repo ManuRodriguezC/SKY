@@ -1,0 +1,149 @@
+{% extends "body.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="w-full bg-base-200 rounded-2xl border border-[var(--border-shadow)] shadow-custom overflow-hidden">
+
+    <!-- Header -->
+    <div class="flex flex-row items-center justify-between px-6 py-7 gap-5">
+
+        <div class="flex flex-row items-center gap-5">
+
+            <div class="bg-blue-600 p-3 rounded-full text-white">
+                {% include 'icons/customers.html' %}
+            </div>
+
+            <div>
+
+                <h2 class="text-xl font-semibold">
+                    Importar obligaciones
+                </h2>
+
+                <p class="text-xs text-gray-500 mt-1">
+                    Carga un archivo Excel para crear o actualizar asociados y sus obligaciones.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Content -->
+    <div class="px-6 pb-8">
+
+        <div class="bg-base-100 rounded-xl border border-[var(--border-shadow)] p-6">
+
+            <!-- Información -->
+            <div
+                class="
+                    mb-6
+                    rounded-xl
+                    border
+                    border-info/20
+                    bg-info/5
+                    p-4
+                    text-sm
+                "
+            >
+
+                <p class="font-medium mb-2">
+                    Importación de obligaciones
+                </p>
+
+                <p class="text-base-content/70">
+                    El archivo debe contener la información de los asociados
+                    y las obligaciones que deseas crear o actualizar.
+                </p>
+
+            </div>
+
+
+            <!-- Formulario -->
+            <form
+                method="post"
+                enctype="multipart/form-data"
+                class="space-y-6"
+            >
+
+                {% csrf_token %}
+
+
+                <!-- Archivo -->
+                <div>
+
+                    <label class="label">
+                        <span class="label-text font-medium">
+                            Archivo Excel
+                        </span>
+                    </label>
+
+                    {{ form.file }}
+
+                    {% if form.file.errors %}
+
+                        <div class="text-error text-sm mt-2">
+
+                            {{ form.file.errors }}
+
+                        </div>
+
+                    {% endif %}
+
+                    <p class="text-xs text-base-content/50 mt-2">
+                        Formatos permitidos: .xlsx, .xls
+                    </p>
+
+                </div>
+
+
+                <!-- Acciones -->
+                <div class="flex justify-end gap-3 pt-4">
+
+                    <a
+                        href="{% url 'customers' %}"
+                        class="
+                            px-5
+                            py-2
+                            rounded-lg
+                            border
+                            border-[var(--border-color)]
+                            hover:bg-[var(--base-hover)]
+                            transition-all
+                            text-sm
+                        "
+                    >
+                        Cancelar
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="
+                            px-5
+                            py-2
+                            rounded-lg
+                            bg-primary
+                            text-primary-content
+                            hover:opacity-90
+                            transition-all
+                            text-sm
+                            font-medium
+                        "
+                    >
+                        Importar archivo
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock content %}

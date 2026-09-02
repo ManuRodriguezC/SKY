@@ -6,6 +6,7 @@ from django.views.generic import ListView, CreateView, UpdateView, TemplateView
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.decorators import permission_required
 
 
 from apps.accounts.models import CustomUser, VerificationToken, VerificationStatus
@@ -112,13 +113,13 @@ class UsersListView(ListView):
 
         return context
 
-class CreateUserView(PermissionRequiredMixin, CreateView):
+
+class CreateUserView(CreateView):
     model = CustomUser
     form_class = CustomUserForm
     success_url = reverse_lazy("users")
     permission_required = "accounts.add_customuser"
     raise_exception = True
-    
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -153,6 +154,8 @@ class UpdateUserView(UpdateView):
     model = CustomUser
     form_class = CustomUserForm
     success_url = reverse_lazy("users")
+    permission_required = "accounts.change_customuser"
+    raise_exception = True
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -200,6 +203,8 @@ class CreateGroupView(CreateView):
     model = Group
     form_class = GroupForm
     success_url = reverse_lazy("groups")
+    permission_required = "auth.add_group"
+    raise_exception = True
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -227,6 +232,8 @@ class UpdateGroupView(UpdateView):
     model = Group
     form_class = GroupForm
     success_url = reverse_lazy("groups")
+    permission_required = "auth.change_group"
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -248,7 +255,7 @@ class UpdateGroupView(UpdateView):
         messages.error(self.request, "Ocurrió un error al actualizar el grupo.")
         return super().form_invalid(form)
 
-
+@permission_required("accounts.change_customuser", raise_exception=True)
 def desactiveUser(request, pk):
     user = get_object_or_404(CustomUser, id=pk)
     if not user:

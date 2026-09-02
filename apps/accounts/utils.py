@@ -8,6 +8,8 @@ TRANSLATIONS = {
     "change": "editar",
     "delete": "eliminar",
     "view": "listar",
+    "execute": "ejecutar",
+    "test": "probar",
 }
 
 TRANSLATION_APP = {
@@ -16,6 +18,7 @@ TRANSLATION_APP = {
     "admin": "Admin Django",
     "auth": "Autenticacion",
     "sessions": "Sesiones",
+    "customers": "Asociados"
 }
 
 TRANSLATION_MODELS = {
@@ -25,6 +28,7 @@ TRANSLATION_MODELS = {
     "logentry": "registros",
     "session": "sesiones",
     "automation": "automatizacion",
+    "customer": "asociado"
 }
 
 def get_permissions():
@@ -37,7 +41,6 @@ def get_permissions():
     for permission in permissions:
         action, model = permission.codename.split("_", 1)
         if TRANSLATION_MODELS.get(model) is None:
-            print("No esta definido: ", model)
             continue
 
         permission.spanish_name = (
@@ -51,7 +54,7 @@ def get_permissions():
         
         if app_name:
             grouped_permissions[app_name].append(permission)
-    print(grouped_permissions)
+
     return grouped_permissions
 
 

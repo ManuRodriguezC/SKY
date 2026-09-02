@@ -69,15 +69,18 @@
         </form>
         
         <div class="flex flex-row gap-5 justify-center items-center">
-            {% url 'create_automation' as add_url %}
-            {% include 'configurator/add_button.html' with add_url=add_url message="Nueva automatizacion" %}
-
-            <button
-                class="btn btn-outline btn-primary"
-                onclick="log_modal.showModal()"
-            >
-                {% include "icons/logs.html" %}
-            </button>
+            {% if perms.automations.add_automation %}
+                {% url 'create_automation' as add_url %}
+                {% include 'configurator/add_button.html' with add_url=add_url message="Nueva automatizacion" %}
+            {% endif %}
+            {% if perms.automations.view_automation %}
+                <button
+                    class="btn btn-outline btn-primary"
+                    onclick="log_modal.showModal()"
+                >
+                    {% include "icons/logs.html" %}
+                </button>
+            {% endif %}
 
             {% include "automations/modal_logs.html" %}
         </div>
@@ -85,202 +88,125 @@
 
     <!-- Table -->
     <div class="overflow-x-auto px-10 my-5 text-xs">
-        <table class="w-full border-separate border-spacing-0">
-            
-            <!-- HEADER -->
-            <thead class="bg-base-300">
-                <tr class="text-left text-sm text-base-content/80">
-                    
-                    <th class="px-6 py-4 font-semibold">
-                        Nombre
-                    </th>
+        {% if perms.automations.view_automation %}
+            <table class="w-full border-separate border-spacing-0">
+                
+                <!-- HEADER -->
+                <thead class="bg-base-300">
+                    <tr class="text-left text-sm text-base-content/80">
+                        
+                        <th class="px-6 py-4 font-semibold">
+                            Nombre
+                        </th>
 
-                    <th class="px-6 py-4 font-semibold text-center">
-                        Semanas & Dias
-                    </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            Semanas & Dias
+                        </th>
 
-                    <th class="px-6 py-4 font-semibold text-center">
-                        Hora
-                    </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            Hora
+                        </th>
 
-                    <th class="px-6 py-4 font-semibold text-center">
-                        Accion
-                    </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            Accion
+                        </th>
 
-                    <th class="px-6 py-4 font-semibold text-center">
-                        Programacion
-                    </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            Programacion
+                        </th>
 
-                    <th class="px-6 py-4 text-right font-semibold">
-                        Acciones
-                    </th>
+                        <th class="px-6 py-4 text-right font-semibold">
+                            Acciones
+                        </th>
 
-                </tr>
-            </thead>
+                    </tr>
+                </thead>
 
-            <!-- BODY -->
-            <tbody>
+                <!-- BODY -->
+                <tbody>
 
-                {% for auto in automations %}
-                    <tr
-                        class="
-                            border-t
-                            border-[var(--border-color)]
-                            hover:bg-[var(--base-hover)]
-                            transition-all
-                            duration-200
-                            {% if not auto.active %}bg-[var(--desactivate)]{% endif %}
-                        "
-                    >
+                    {% for auto in automations %}
+                        <tr
+                            class="
+                                border-t
+                                border-[var(--border-color)]
+                                hover:bg-[var(--base-hover)]
+                                transition-all
+                                duration-200
+                                {% if not auto.active %}bg-[var(--desactivate)]{% endif %}
+                            "
+                        >
 
-                        <td class="px-6 py-4 border-t border-[var(--border-color)]">
-                          <p class="">
-                              {{ auto.name }}
-                          </p>
-                        </td>
+                            <td class="px-6 py-4 border-t border-[var(--border-color)]">
+                            <p class="">
+                                {{ auto.name }}
+                            </p>
+                            </td>
 
-                        <td class="px-6 py-4 border-t border-[var(--border-color)]">
+                            <td class="px-6 py-4 border-t border-[var(--border-color)]">
 
-                            <div class="flex flex-col items-start gap-2 text-sm">
+                                <div class="flex flex-col items-start gap-2 text-sm">
 
-                                <span class="text-xs">
-                                    {{ auto.list_days }}
-                                </span>
+                                    <span class="text-xs">
+                                        {{ auto.list_days }}
+                                    </span>
 
-                                <span class="text-xs">
-                                    {{ auto.list_weeks }}
-                                </span>
+                                    <span class="text-xs">
+                                        {{ auto.list_weeks }}
+                                    </span>
 
-                            </div>
+                                </div>
 
-                        </td>
+                            </td>
 
-                        <td class="px-6 py-4 border-t border-[var(--border-color)]">
+                            <td class="px-6 py-4 border-t border-[var(--border-color)]">
 
-                            <div class="flex flex-row items-center gap-2 text-sm">
+                                <div class="flex flex-row items-center gap-2 text-sm">
 
-                                <span class="text-primary">
-                                    {% include "icons/clock.html" %}
-                                </span>
+                                    <span class="text-primary">
+                                        {% include "icons/clock.html" %}
+                                    </span>
 
-                                <span>
-                                    {{ auto.get_hour }}
-                                </span>
+                                    <span>
+                                        {{ auto.get_hour }}
+                                    </span>
 
-                            </div>
+                                </div>
 
-                        </td>
+                            </td>
 
-                        <td class="px-6 py-4 border-t border-[var(--border-color)]">
+                            <td class="px-6 py-4 border-t border-[var(--border-color)]">
 
-                            <div class="flex items-center gap-2 text-xs">
+                                <div class="flex items-center gap-2 text-xs">
 
-                                <span>
-                                    {{ auto.range_date }}
-                                </span>
+                                    <span>
+                                        {{ auto.range_date }}
+                                    </span>
 
-                            </div>
+                                </div>
 
-                        </td>
+                            </td>
 
-                        <td class="px-6 py-4 border-t border-[var(--border-color)]">
+                            <td class="px-6 py-4 border-t border-[var(--border-color)]">
 
-                            <span class="
-                                inline-flex items-center gap-2
-                                px-3 py-1
-                                rounded-full
-                                text-xs font-medium
-                            ">
-                                <span class="w-2 h-2 rounded-full"></span>
-                                {{ auto.get_action_display }} - Aplica para {{ auto.apply }} registros
-                            </span>
-                        </td>
-
-                        <!-- ACTIONS -->
-                        <td class="px-6 py-4 border-t border-[var(--border-color)]">
-
-                            <div class="flex justify-end gap-2">
-
-                                <!-- ACTIVE/INACTIVE -->
-                                <button class="
-                                    w-7 h-7
-                                    rounded-lg
-                                    border border-primary/30
-                                    flex items-center justify-center
-                                    transition-all
-                                    duration-200
-                                    hover:shadow-xl
-                                    {% if not auto.active %}text-orange-500{% else %}text-blue-500{% endif %}
-                                "
-                                title="
-                                    {% if auto.active %}Desactivar automatización{% else %}Activar automatización{% endif %}
-                                "
-                                onclick="openConfirmationModal({
-                                    url: '{% url "change_status" auto.id %}',
-                                    title: '{% if auto.active %}Desactivar automatización{% else %}Activar automatización{% endif %}',
-                                    message: '{% if auto.active %}¿Desea desactivar la automatización?{% else %}¿Desea activar la automatización?{% endif %}',
-                                    buttonText: 'Confirmar'
-                                })">
-                                    {% include "icons/power.html" %}
-                                </button>
-
-                                 <button class="
-                                    w-7 h-7
-                                    rounded-lg
-                                    border border-primary/30
-                                    flex items-center justify-center
-                                    transition-all
-                                    duration-200
-                                    hover:shadow-xl
-                                    text-green-500
-                                    "
-                                    title="Ejecutar automatización"
-                                    onclick="openConfirmationModal({
-                                        url: '{% url "execute_now" auto.id %}',
-                                        title: 'Ejecutar automatización',
-                                        message: '¿Desea ejecutar esta automatización ahora? Una vez iniciada, la ejecución se realizará en segundo plano y no podrá cancelarse.',
-                                        buttonText: 'Confirmar'
-                                    })">
-                                        {% include "icons/play.html" %}
-                                </button>
-
-                                <button class="
-                                    w-7 h-7
-                                    rounded-lg
-                                    border border-primary/30
-                                    flex items-center justify-center
-                                    transition-all
-                                    duration-200
-                                    hover:shadow-xl
-                                    text-purple-400
-                                    "
-                                    title="Prueba automatización"
-                                    onclick="openConfirmationModal({
-                                        url: '{% url "test_automation" auto.id %}',
-                                        title: 'Prueba de envio de automatización',
-                                        message: 'Se enviara un correo de prueba de la automatizacion, esta prueba se realizara con un usuario de prueba, valide su correo de origen o destino.',
-                                        buttonText: 'Probar'
-                                    })">
-                                        {% include "icons/test.html" %}
-                                </button>
-
-                                <!-- EDIT -->
-                                <a href="{% url 'edit_automation' auto.id %}"
-                                title="Editar"
-                                class="w-7 h-7
-                                    rounded-lg
-                                    border border-primary/30
-                                    text-primary
-                                    hover:bg-primary/10
-                                    flex items-center justify-center
-                                    transition-all
+                                <span class="
+                                    inline-flex items-center gap-2
+                                    px-3 py-1
+                                    rounded-full
+                                    text-xs font-medium
                                 ">
-                                    {% include "icons/edit.html" %}
-                                </a>
+                                    <span class="w-2 h-2 rounded-full"></span>
+                                    {{ auto.get_action_display }} - Aplica para {{ auto.apply }} registros
+                                </span>
+                            </td>
 
-                                {% if not auto.active %}
-                                    <!-- DELETE -->
-                                     <button class="
+                            <!-- ACTIONS -->
+                            <td class="px-6 py-4 border-t border-[var(--border-color)]">
+
+                                <div class="flex justify-end gap-2">
+
+                                    <!-- ACTIVE/INACTIVE -->
+                                    <button class="
                                         w-7 h-7
                                         rounded-lg
                                         border border-primary/30
@@ -288,44 +214,130 @@
                                         transition-all
                                         duration-200
                                         hover:shadow-xl
-                                        text-red-500
-                                        "
-                                        title="Eliminar automatización"
-                                        onclick="openConfirmationModal({
-                                            url: '{% url "delete" auto.id %}',
-                                            title: 'Eliminar automatización',
-                                            message: 'Esta seguro de eliminar este registro?, las automatizaciones programadas no se ejecutaran',
-                                            buttonText: 'Confirmar'
-                                        })">
-                                            {% include "icons/trash.html" %}
+                                        {% if not auto.active %}text-orange-500{% else %}text-blue-500{% endif %}
+                                    "
+                                    title="
+                                        {% if auto.active %}Desactivar automatización{% else %}Activar automatización{% endif %}
+                                    "
+                                    onclick="openConfirmationModal({
+                                        url: '{% url "change_status" auto.id %}',
+                                        title: '{% if auto.active %}Desactivar automatización{% else %}Activar automatización{% endif %}',
+                                        message: '{% if auto.active %}¿Desea desactivar la automatización?{% else %}¿Desea activar la automatización?{% endif %}',
+                                        buttonText: 'Confirmar'
+                                    })">
+                                        {% include "icons/power.html" %}
+                                    </button>
+
+                                    {% if perms.automations.execute_automation %}
+                                        <button class="
+                                            w-7 h-7
+                                            rounded-lg
+                                            border border-primary/30
+                                            flex items-center justify-center
+                                            transition-all
+                                            duration-200
+                                            hover:shadow-xl
+                                            text-green-500
+                                            "
+                                            title="Ejecutar automatización"
+                                            onclick="openConfirmationModal({
+                                                url: '{% url "execute_now" auto.id %}',
+                                                title: 'Ejecutar automatización',
+                                                message: '¿Desea ejecutar esta automatización ahora? Una vez iniciada, la ejecución se realizará en segundo plano y no podrá cancelarse.',
+                                                buttonText: 'Confirmar'
+                                            })">
+                                                {% include "icons/play.html" %}
                                         </button>
+                                    {% endif %}
 
-                                {% endif %}
-                            </div>
+                                    {% if perms.automations.test_automation %}
+                                        <button class="
+                                            w-7 h-7
+                                            rounded-lg
+                                            border border-primary/30
+                                            flex items-center justify-center
+                                            transition-all
+                                            duration-200
+                                            hover:shadow-xl
+                                            text-purple-400
+                                            "
+                                            title="Prueba automatización"
+                                            onclick="openConfirmationModal({
+                                                url: '{% url "test_automation" auto.id %}',
+                                                title: 'Prueba de envio de automatización',
+                                                message: 'Se enviara un correo de prueba de la automatizacion, esta prueba se realizara con un usuario de prueba, valide su correo de origen o destino.',
+                                                buttonText: 'Probar'
+                                            })">
+                                                {% include "icons/test.html" %}
+                                        </button>
+                                    {% endif %}
 
-                        </td>
+                                    <!-- EDIT -->
+                                    {% if perms.automations.change_automation %}
+                                        <a href="{% url 'edit_automation' auto.id %}"
+                                        title="Editar"
+                                        class="w-7 h-7
+                                            rounded-lg
+                                            border border-primary/30
+                                            text-primary
+                                            hover:bg-primary/10
+                                            flex items-center justify-center
+                                            transition-all
+                                        ">
+                                            {% include "icons/edit.html" %}
+                                        </a>
+                                    {% endif %}
 
-                    </tr>
+                                    {% if not auto.active and perms.automations.delete_automation %}
+                                        <!-- DELETE -->
+                                        <button class="
+                                            w-7 h-7
+                                            rounded-lg
+                                            border border-primary/30
+                                            flex items-center justify-center
+                                            transition-all
+                                            duration-200
+                                            hover:shadow-xl
+                                            text-red-500
+                                            "
+                                            title="Eliminar automatización"
+                                            onclick="openConfirmationModal({
+                                                url: '{% url "delete" auto.id %}',
+                                                title: 'Eliminar automatización',
+                                                message: 'Esta seguro de eliminar este registro?, las automatizaciones programadas no se ejecutaran',
+                                                buttonText: 'Confirmar'
+                                            })">
+                                                {% include "icons/trash.html" %}
+                                            </button>
 
-                {% empty %}
+                                    {% endif %}
+                                </div>
 
-                    <tr>
-                        <td
-                            colspan="6"
-                            class="py-16 text-center text-base-content/60"
-                        >
-                            No hay automatizaciones registradas.
-                        </td>
-                    </tr>
+                            </td>
 
-                {% endfor %}
+                        </tr>
 
-            </tbody>
+                    {% empty %}
 
-        </table>
+                        <tr>
+                            <td
+                                colspan="6"
+                                class="py-16 text-center text-base-content/60"
+                            >
+                                No hay automatizaciones registradas.
+                            </td>
+                        </tr>
 
-        {% include 'configurator/paginator.html' %}
+                    {% endfor %}
 
+                </tbody>
+
+            </table>
+            
+            {% include 'configurator/paginator.html' %}
+        {% else %}
+            <p>No tiene permisos de listado de automatizaciones</p>
+        {% endif %}
     </div>
 </div>
 

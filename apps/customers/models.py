@@ -1,3 +1,5 @@
+from apps.accounts.models import CustomUser
+
 from django.db import models
 from django.db.models import Max
 
@@ -176,3 +178,50 @@ class CustomerLog(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class ImportExecution(models.Model):
+
+    class Type(models.TextChoices):
+        CUSTOMERS = "customers", "Asociados"
+        OBLIGATIONS = "obligations", "Obligaciones"
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pendiente"
+        PROCESSING = "processing", "Procesando"
+        SUCCESS = "success", "Completada"
+        FAILED = "failed", "Fallida"
+
+    file = models.FileField(
+        upload_to="imports/",
+    )
+
+    type = models.CharField(
+        max_length=20,
+        choices=Type.choices,
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+
+    user = models.ForeignKey(
+        CustomUser,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+
+    detail = models.TextField(
+        blank=True,
+        default="",
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )

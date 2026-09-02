@@ -1,8 +1,14 @@
-from django.db.models import Count, Max, Sum
-from django.views.generic import ListView, DetailView
+from django.contrib import messages
+from django.db.models import Max
+from django.views.generic import ListView, DetailView, FormView
+from django.urls import reverse_lazy
+from django.shortcuts import redirect
+from pathlib import Path
 
 
-from .models import Customer
+from .models import Customer, ImportExecution
+from .forms import ImportExcelForm
+from .tasks import import_obligations
 
 
 class CustomerListView(ListView):
@@ -72,8 +78,6 @@ class CustomerListView(ListView):
         return context
     
 
-
-
 class CustomerDetail(DetailView):
     model = Customer
     template_name = "detail.html"
@@ -121,3 +125,83 @@ class CustomerDetail(DetailView):
         })
 
         return context
+
+
+class ImportObligationsView(FormView):
+
+    template_name = "import_obligations.html"
+
+    form_class = ImportExcelForm
+
+    success_url = reverse_lazy(
+        "customers"
+    )
+
+    def form_valid(self, form):
+
+        try:
+
+            file = form.cleaned_data["file"]
+
+            file_path = (
+                Path("/app/files/log")
+                / file.name
+            )
+
+
+            with open(file_path, "wb+") as destination:
+
+                for chunk in file.chunks():
+                    destination.write(chunk)
+            
+            import_obligations.delay(
+                file.name
+            )
+
+            messages.success(
+                self.request,
+                "Se ha cargado de forma correcta."
+            )
+
+            return super().form_valid(form)
+
+        except Exception as error:
+            messages.error(
+                self.request,
+                "Se ha presentado un error al cargar el archivo."
+            )
+
+            return self.form_invalid(form)
+        
+
+# class ImportCustomersView(FormView):
+
+#     template_name = "customers/import_customers.html"
+
+#     form_class = ImportExcelForm
+
+#     success_url = reverse_lazy(
+#         "customers"
+#     )
+
+#     def form_valid(self, form):
+
+#         execution = ImportExecution.objects.create(
+#             file=form.cleaned_data["file"],
+#             type=ImportExecution.Type.CUSTOMERS,
+#             user=self.request.user,
+#         )
+
+#         import_customers.delay(
+#             execution.id
+#         )
+
+#         messages.success(
+#             self.request,
+#             "El archivo fue cargado correctamente. "
+#             "La importación se ejecutará en segundo plano.",
+#         )
+
+#         return redirect(
+#             self.get_success_url()
+#         )
