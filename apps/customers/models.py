@@ -23,14 +23,14 @@ class Customer(models.Model):
     last_name = models.CharField(max_length=100)
     document = models.CharField(max_length=50)
     # type_document = models.CharField(max_length=50, null=True, blank=True)
-    email = models.EmailField()
-    status = models.CharField(max_length=100)
-    type_customer = models.CharField(max_length=100)
-    nomina_name = models.CharField(max_length=100)
-    age = models.IntegerField()
-    gender = models.CharField(max_length=10)
-    phone = models.CharField()
-    score = models.CharField(max_length=10)
+    email = models.EmailField(null=True, blank=True)
+    status = models.CharField(max_length=100, null=True, blank=True)
+    type_customer = models.CharField(max_length=100, null=True, blank=True)
+    nomina_name = models.CharField(max_length=100, null=True, blank=True)
+    age = models.IntegerField(null=True, blank=True)
+    gender = models.CharField(max_length=10, null=True, blank=True)
+    phone = models.CharField(null=True, blank=True)
+    score = models.CharField(max_length=10, null=True, blank=True)
     city = models.CharField(max_length=100, null=True, blank=True)
     contributions = models.IntegerField(null=True, blank=True)
     test = models.BooleanField(default=False)
@@ -112,6 +112,7 @@ class Customer(models.Model):
                 "phone": "3000000000",
                 "score": "A",
                 "city": "Bogotá",
+                "contributions": "1222222",
             },
         )
 
@@ -136,9 +137,9 @@ class Obligations(models.Model):
     )
     
     num_obligacion = models.CharField(max_length=100)
-    credit_line = models.CharField(max_length=100)
-    mora_days = models.IntegerField()
-    total = models.CharField(max_length=100)
+    credit_line = models.CharField(max_length=100, null=True, blank=True)
+    mora_days = models.IntegerField(null=True, blank=True)
+    total = models.CharField(max_length=100, null=True, blank=True)
     
     @property
     def mora_status(self):
