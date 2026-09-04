@@ -1,14 +1,15 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib import messages
 from django.db.models import Max
 from django.views.generic import ListView, DetailView, FormView
 from django.urls import reverse_lazy
-from django.shortcuts import redirect
 from pathlib import Path
+import pandas as pd
 
 
 from .models import Customer, ImportExecution
 from .forms import ImportExcelForm
-from .tasks import import_obligations
+from .tasks import import_obligations, import_customers
 
 
 class CustomerListView(ListView):
@@ -127,7 +128,31 @@ class CustomerDetail(DetailView):
         return context
 
 
-class ImportObligationsView(FormView):
+class ImportObligationsView(PermissionRequiredMixin, FormView):
+
+    permission_required = (
+        "customers.import_importexecution"
+    )
+    
+    REQUIRED_OBLIGATION_COLUMNS = [
+        "AP - Identificación",
+        "AP - Nombre Ciudad Dir.",
+        "AP - Nombre",
+        "AP - Apellido",
+        "AP - Dirección Electrónica",
+        "AP - Estado como Asociado",
+        "AP - Nombre Tipo Asociado",
+        "AP - Nombre Nomina Asoc.",
+        "AP - Edad",
+        "AP - Sexo",
+        "AP - Teléfono celular",
+        "CA - Calificación Crédito",
+        "AP - Total Aportes",
+        "CA - Número de Obligación",
+        "CA - Nombre Línea del Crédito",
+        "CA - Días vencidos",
+        "TOTAL DE DEUDA",
+    ]
 
     template_name = "import_obligations.html"
 
@@ -136,12 +161,47 @@ class ImportObligationsView(FormView):
     success_url = reverse_lazy(
         "customers"
     )
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        registers = ImportExecution.objects.filter(
+            type=ImportExecution.Type.OBLIGATIONS
+        ).order_by("-id")
+        
+        context.update({
+            "logs": registers
+        })
+        
+        return context
 
     def form_valid(self, form):
 
         try:
-
+            
             file = form.cleaned_data["file"]
+
+            df = pd.read_excel(file)
+
+            missing_columns = [
+                column
+                for column in self.REQUIRED_OBLIGATION_COLUMNS
+                if column not in df.columns
+            ]
+
+            if missing_columns:
+
+                columns = ", ".join(
+                    missing_columns
+                )
+
+                messages.error(
+                    self.request,
+                    f"El archivo no contiene las siguientes "
+                    f"columnas requeridas: {columns}"
+                )
+
+                return self.form_invalid(form)
 
             file_path = (
                 Path("/app/files/log")
@@ -153,14 +213,21 @@ class ImportObligationsView(FormView):
 
                 for chunk in file.chunks():
                     destination.write(chunk)
+                    
+            import_execution = ImportExecution.objects.create(
+                file=file.name,
+                type=ImportExecution.Type.OBLIGATIONS,
+                status=ImportExecution.Status.PENDING,
+                user=self.request.user,
+            )
             
             import_obligations.delay(
-                file.name
+                file.name, import_execution.id
             )
 
             messages.success(
                 self.request,
-                "Se ha cargado de forma correcta."
+                "Se ha cargado de forma correcta, los registros se actualizaran o crearan en paralelo."
             )
 
             return super().form_valid(form)
@@ -174,34 +241,112 @@ class ImportObligationsView(FormView):
             return self.form_invalid(form)
         
 
-# class ImportCustomersView(FormView):
+class ImportCustomersView(PermissionRequiredMixin, FormView):
+    permission_required = (
+        "customers.import_importexecution"
+    )
+    
+    REQUIRED_CUSTOMERS_COLUMNS = [
+        "A_NUMNIT",
+        "NOMBRE",
+        "APELLIDO",
+        "FECHA DE AFILIACION",
+        "FECHA NACIMIENTO",
+        "T_TERCER",
+        "D_TERCER",
+        "CORREO",
+        "T_TERCEL",
+        "N_NOMINA",
+        "N_BARRIO",
+        "K_CIUDAD",
+        "N_CIUDAD",
+        "K_DEPART",
+        "N_DEPART",
+    ]
 
-#     template_name = "customers/import_customers.html"
+    template_name = "import_customers.html"
 
-#     form_class = ImportExcelForm
+    form_class = ImportExcelForm
 
-#     success_url = reverse_lazy(
-#         "customers"
-#     )
+    success_url = reverse_lazy(
+        "customers"
+    )
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        registers = ImportExecution.objects.filter(
+            type=ImportExecution.Type.CUSTOMERS
+        ).order_by("-id")
+        
+        context.update({
+            "logs": registers
+        })
+        
+        return context
 
-#     def form_valid(self, form):
+    def form_valid(self, form):
 
-#         execution = ImportExecution.objects.create(
-#             file=form.cleaned_data["file"],
-#             type=ImportExecution.Type.CUSTOMERS,
-#             user=self.request.user,
-#         )
+        try:
+            
+            file = form.cleaned_data["file"]
 
-#         import_customers.delay(
-#             execution.id
-#         )
+            df = pd.read_excel(file)
 
-#         messages.success(
-#             self.request,
-#             "El archivo fue cargado correctamente. "
-#             "La importación se ejecutará en segundo plano.",
-#         )
+            missing_columns = [
+                column
+                for column in self.REQUIRED_CUSTOMERS_COLUMNS
+                if column not in df.columns
+            ]
 
-#         return redirect(
-#             self.get_success_url()
-#         )
+            if missing_columns:
+
+                columns = ", ".join(
+                    missing_columns
+                )
+
+                messages.error(
+                    self.request,
+                    f"El archivo no contiene las siguientes "
+                    f"columnas requeridas: {columns}"
+                )
+
+                return self.form_invalid(form)
+
+            file_path = (
+                Path("/app/files/log")
+                / file.name
+            )
+
+
+            with open(file_path, "wb+") as destination:
+
+                for chunk in file.chunks():
+                    destination.write(chunk)
+                    
+            import_execution = ImportExecution.objects.create(
+                file=file.name,
+                type=ImportExecution.Type.CUSTOMERS,
+                status=ImportExecution.Status.PENDING,
+                user=self.request.user,
+            )
+            
+            import_customers.delay(
+                file.name, import_execution.id
+            )
+
+            messages.success(
+                self.request,
+                "Se ha cargado de forma correcta, los asociados se actualizaran o crearan en paralelo."
+            )
+
+            return super().form_valid(form)
+
+        except Exception as error:
+            messages.error(
+                self.request,
+                "Se ha presentado un error al cargar el archivo."
+            )
+
+            return self.form_invalid(form)
+    

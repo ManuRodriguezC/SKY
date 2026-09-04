@@ -1,4 +1,4 @@
-<dialog id="customer_modal" class="modal">
+<dialog id="import_obligations_modal" class="modal">
 
     <div
     class="modal-box overflow-y-hidden"
@@ -8,10 +8,10 @@
         <div class="flex items-center justify-between mb-6">
             <div class="flex flex-col justify-start gap-3">
                 <h2 class="text-xl font-semibold">
-                    Historial del asociado
+                    Historial de cargue de obligaciones
                 </h2>
 
-                <p class="text-xs text-base-content/60">Se listara el historial de .</p>
+                <p class="text-xs text-base-content/60">A continuacion se cargara el historial de carga de obligaciones.</p>
             </div>
 
             <form method="dialog">
@@ -30,20 +30,17 @@
 
               {% for log in logs %}
 
-                <div class="border-l-2 border-primary pl-5 pb-5">
-
-                    <p class="font-medium">
-                        {{ log.get_action_display }}
-                    </p>
-
+                <div class="border-l-2 border-primary pl-5 pb-2 gap-2">
+                    <div class="flex flex-row justify-between">
+                        <p class="font-medium">
+                            Archivo:  {{ log.file }} <span class="px-10 italic text-sm font-bold"></span>
+                        </p>
+                        <p>{{ log.get_status_display }}</p>
+                    </div>
                     <p class="text-sm text-base-content/60">
-                        {{ log.description }}
+                        Subido por: {{ log.user.username }} - {{log.created_at}}
                     </p>
-
-                    <p class="text-xs text-base-content/40 mt-1">
-                        {{ log.created_at }}
-                    </p>
-
+                    <p class="text-xs italic">{{ log.detail }}</p>
                 </div>
 
             {% endfor %}

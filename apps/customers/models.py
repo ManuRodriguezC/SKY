@@ -182,6 +182,14 @@ class CustomerLog(models.Model):
 
 
 class ImportExecution(models.Model):
+    
+    class Meta:
+        permissions = [
+            (
+                "import_importexecution",
+                "Puede importar obligaciones",
+            ),
+        ]
 
     class Type(models.TextChoices):
         CUSTOMERS = "customers", "Asociados"
@@ -226,3 +234,25 @@ class ImportExecution(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True,
     )
+    
+    def mark_processing(self):
+        self.status = self.Status.PROCESSING
+        self.save(update_fields=["status", "updated_at"])
+
+    def mark_success(self, detail=""):
+        self.status = self.Status.SUCCESS
+        self.detail = detail
+        self.save(update_fields=[
+            "status",
+            "detail",
+            "updated_at",
+        ])
+
+    def mark_failed(self, detail=""):
+        self.status = self.Status.FAILED
+        self.detail = detail
+        self.save(update_fields=[
+            "status",
+            "detail",
+            "updated_at",
+        ])

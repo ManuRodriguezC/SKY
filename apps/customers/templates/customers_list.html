@@ -47,34 +47,45 @@
 
     </div>
 
-    <div class="px-10 flex flex-row gap-4 text-sm font-semibold">
-        <div data-status="todos" class="filter-card flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
-            <div class="h-2 w-2 rounded-full bg-blue-400"></div>
-            <p class="text-[var(--blue-text)]">Todos</p>
-            <p class="text-blue-400 bg-blue-800/30 rounded-md px-2">{{ num_customers }}</p>
+    <div class="flex flex-row justify-between items-center">
+        <div class="px-10 flex flex-row gap-4 text-sm font-semibold">
+            <div data-status="todos" class="filter-card flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
+                <div class="h-2 w-2 rounded-full bg-blue-400"></div>
+                <p class="text-[var(--blue-text)]">Todos</p>
+                <p class="text-blue-400 bg-blue-800/30 rounded-md px-2">{{ num_customers }}</p>
+            </div>
+            <div data-status="active" class="filter-card flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
+                <div class="h-2 w-2 rounded-full bg-green-400"></div>
+                <p class="text-[var(--green-text)]">Activos</p>
+                <p class="text-green-300 bg-green-800/10 rounded-md px-2">{{ actives }}</p>
+            </div>
+            <div data-status="inactive" class="filter-card flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
+                <div class="h-2 w-2 rounded-full bg-red-400"></div>
+                <p class="text-[var(--red-text)]">Inactivos</p>
+                <p class="text-red-300 bg-red-800/10 rounded-md px-2">{{ inactives }}</p>
+            </div>
+            <div data-status="mora" class="filter-card flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
+                <div class="h-2 w-2 rounded-full bg-orange-400"></div>
+                <p class="text-[var(--orange-text)]">En mora</p>
+                <p class="text-orange-300 bg-orange-800/10 rounded-md px-2">{{ mora }}</p>
+            </div>
         </div>
-        <div data-status="active" class="filter-card flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
-            <div class="h-2 w-2 rounded-full bg-green-400"></div>
-            <p class="text-[var(--green-text)]">Activos</p>
-            <p class="text-green-300 bg-green-800/10 rounded-md px-2">{{ actives }}</p>
-        </div>
-        <div data-status="inactive" class="filter-card flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
-            <div class="h-2 w-2 rounded-full bg-red-400"></div>
-            <p class="text-[var(--red-text)]">Inactivos</p>
-            <p class="text-red-300 bg-red-800/10 rounded-md px-2">{{ inactives }}</p>
-        </div>
-        <div data-status="mora" class="filter-card flex flex-row items-center gap-3 border border-[var(--border-shadow)] bg-base-100 px-5 py-2 rounded-md">
-            <div class="h-2 w-2 rounded-full bg-orange-400"></div>
-            <p class="text-[var(--orange-text)]">En mora</p>
-            <p class="text-orange-300 bg-orange-800/10 rounded-md px-2">{{ mora }}</p>
-        </div>
-        <a
-            class="bg-purple-950"
-            href={% url "import_obligations" %}
-        >
-            Cargar obligaciones
-        </a>
-
+        {% if perms.customers.import_importexecution %}
+            <div class="px-10 flex flex-row gap-4 text-sm font-semibold">
+                <a
+                    class="bg-blue-600 text-xs text-white px-5 py-2 rounded-md hover:opacity-90 transition-all duration-200"
+                    href={% url "import_obligations" %}
+                >
+                    Cargar obligaciones
+                </a>
+                <a
+                    class="bg-blue-600 text-xs text-white px-5 py-2 rounded-md hover:opacity-90 transition-all duration-200"
+                    href={% url "import_customers" %}
+                >
+                    Cargar asociados
+                </a>
+            </div>
+        {% endif %}
     </div>
 
     <!-- Table -->

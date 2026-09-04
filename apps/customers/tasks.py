@@ -6,14 +6,27 @@ import pandas as pd
 from celery import shared_task
 from django.db import transaction
 
+
 from apps.customers.models import (
     Customer,
     Obligations,
     CustomerLog,
+    ImportExecution
+)
+from apps.customers.utils import (
+    get_data,
+    get_data_obligations,
+    get_data_customer,
+    get_document,
+    get_city,
+    clean_value,
+    values_are_equal,
 )
 
 @shared_task
-def import_obligations(file_name):
+def import_customers(file_name, import_id):
+    import_execution = ImportExecution.objects.get(id=import_id)
+    import_execution.mark_processing()
     
     print("========== INICIO IMPORTACIÓN ==========")
     print(f"Archivo recibido: {file_name}")
@@ -26,150 +39,256 @@ def import_obligations(file_name):
         )
 
     df = pd.read_excel(file_path)
+
+    created_customers = 0
+    updated_customers = 0
+
+    try:
+
+        with transaction.atomic():
+
+            for _, row in df.iterrows():
+                document = get_document(row, "A_NUMNIT")
+                city = get_city(row, "N_CIUDAD")
+                data = get_data_customer(row, city)
+
+                customer, created = (
+                    Customer.objects.update_or_create(
+                        document=document,
+                        defaults=data,
+                    )
+                )
+
+                if created:
+
+                    created_customers += 1
+
+                    CustomerLog.objects.create(
+                        customer=customer,
+                        action=(
+                            CustomerLog.Action
+                            .CUSTOMER_CREATED
+                        ),
+                        description=(
+                            "Asociado creado mediante "
+                            "importación de Excel."
+                        ),
+                    )
+
+                else:
+
+                    changed = False
+
+                    for field, new_value in data.items():
+                        current_value = getattr(customer, field)
+
+                        if current_value != new_value:
+                            changed = True
+                            setattr(customer, field, new_value)
+
+                    if changed:
+                        customer.save()
+                        updated_customers += 1
+
+                        CustomerLog.objects.create(
+                            customer=customer,
+                            action=CustomerLog.Action.CUSTOMER_UPDATED,
+                            description=(
+                                "Asociado actualizado mediante "
+                                "importación de Excel."
+                            ),
+                        )
+
+        detail = {}
+
+        if created_customers:
+            detail["Asociados creados"] = created_customers
+
+        if updated_customers:
+            detail["Asociados actualizados"] = updated_customers
+
+        if not detail:
+            detail["Resultado"] = "No se registró ningún cambio."
+        
+        detail_text = "\n".join(
+            f"{key}: {value}"
+            for key, value in detail.items()
+        )
+        
+        import_execution.mark_success(detail_text)
+
+    except Exception as e:
+        print(e)
+        import_execution.mark_failed(f"Se presento un fallo: {e}")
+
+
+@shared_task
+def import_obligations(file_name, import_id):
+    import_execution = ImportExecution.objects.get(id=import_id)
+    import_execution.mark_processing()
     
-    print(f"Ruta del archivo: {file_path}")
-    print(f"Archivo existe: {file_path.exists()}")
+    print("========== INICIO IMPORTACIÓN ==========")
+    print(f"Archivo recibido: {file_name}")
+
+    file_path = Path("/app/files/log") / file_name
+
+    if not file_path.exists():
+        raise FileNotFoundError(
+            f"Archivo no encontrado: {file_path}"
+        )
+
+    df = pd.read_excel(file_path)
 
     created_customers = 0
     updated_customers = 0
     created_obligations = 0
     updated_obligations = 0
 
-    with transaction.atomic():
+    try:
 
-        for _, row in df.iterrows():
+        with transaction.atomic():
 
-            document = str(
-                row["AP - Identificación"]
-            ).strip()
+            for _, row in df.iterrows():
+                document = get_document(row, "AP - Identificación")
+                city = get_city(row, "AP - Nombre Ciudad Dir.")
+                data = get_data(row, city)
 
-            city = row["AP - Nombre Ciudad Dir."]
-
-            city = (
-                city.strip().title()
-                if pd.notna(city)
-                else None
-            )
-
-            customer, created = (
-                Customer.objects.update_or_create(
-                    document=document,
-                    defaults={
-                        "first_name": row["AP - Nombre"],
-                        "last_name": row["AP - Apellido"],
-                        "email": row[
-                            "AP - Dirección Electrónica"
-                        ],
-                        "status": row[
-                            "AP - Estado como Asociado"
-                        ],
-                        "type_customer": row[
-                            "AP - Nombre Tipo Asociado"
-                        ],
-                        "nomina_name": row[
-                            "AP - Nombre Nomina Asoc."
-                        ],
-                        "age": row["AP - Edad"],
-                        "gender": row["AP - Sexo"],
-                        "phone": row[
-                            "AP - Teléfono celular"
-                        ],
-                        "score": row[
-                            "CA - Calificación Crédito"
-                        ],
-                        "city": city,
-                        "contributions": row[""],
-                    },
-                )
-            )
-
-            if created:
-
-                created_customers += 1
-
-                CustomerLog.objects.create(
-                    customer=customer,
-                    action=(
-                        CustomerLog.Action
-                        .CUSTOMER_CREATED
-                    ),
-                    description=(
-                        "Asociado creado mediante "
-                        "importación de Excel."
-                    ),
+                customer, created = (
+                    Customer.objects.update_or_create(
+                        document=document,
+                        defaults=data,
+                    )
                 )
 
-            else:
+                if created:
 
-                updated_customers += 1
+                    created_customers += 1
 
-                CustomerLog.objects.create(
-                    customer=customer,
-                    action=(
-                        CustomerLog.Action
-                        .CUSTOMER_UPDATED
-                    ),
-                    description=(
-                        "Asociado actualizado mediante "
-                        "importación de Excel."
-                    ),
+                    CustomerLog.objects.create(
+                        customer=customer,
+                        action=(
+                            CustomerLog.Action
+                            .CUSTOMER_CREATED
+                        ),
+                        description=(
+                            "Asociado creado mediante "
+                            "importación de Excel."
+                        ),
+                    )
+
+                else:
+
+                    changed = False
+
+                    for field, new_value in data.items():
+                        current_value = getattr(customer, field)
+
+                        if current_value != new_value:
+                            changed = True
+                            setattr(customer, field, new_value)
+
+                    if changed:
+                        customer.save()
+                        updated_customers += 1
+
+                        CustomerLog.objects.create(
+                            customer=customer,
+                            action=CustomerLog.Action.CUSTOMER_UPDATED,
+                            description=(
+                                "Asociado actualizado mediante "
+                                "importación de Excel."
+                            ),
+                        )
+
+                num_obligation = clean_value(
+                    row["CA - Número de Obligación"]
+                )
+                
+                data_obligation = get_data_obligations(row)
+                
+                obligation, created = (
+                    Obligations.objects.get_or_create(
+                        customer=customer,
+                        num_obligacion=num_obligation,
+                        defaults=data_obligation,
+                    )
                 )
 
-            obligation, created = (
-                Obligations.objects.update_or_create(
-                    customer=customer,
-                    num_obligacion=row[
-                        "CA - Número de Obligación"
-                    ],
-                    defaults={
-                        "credit_line": row[
-                            "CA - Nombre Línea del Crédito"
-                        ],
-                        "mora_days": row[
-                            "CA - Días vencidos"
-                        ],
-                        "total": row[
-                            "TOTAL DE DEUDA"
-                        ],
-                    },
-                )
-            )
+                if created:
 
-            if created:
+                    created_obligations += 1
 
-                created_obligations += 1
+                    CustomerLog.objects.create(
+                        customer=customer,
+                        action=(
+                            CustomerLog.Action
+                            .OBLIGATION_CREATED
+                        ),
+                        description=(
+                            f"Se registró la obligación "
+                            f"{obligation.num_obligacion}."
+                        ),
+                    )
 
-                CustomerLog.objects.create(
-                    customer=customer,
-                    action=(
-                        CustomerLog.Action
-                        .OBLIGATION_CREATED
-                    ),
-                    description=(
-                        f"Se registró la obligación "
-                        f"{obligation.num_obligacion}."
-                    ),
-                )
+                else:
+                    changes = []
+                    for field, new_value in data_obligation.items():
 
-            else:
+                        old_value = getattr(
+                            obligation,
+                            field
+                        )
+                        if not values_are_equal(old_value, new_value):
+                            changes.append(
+                                f"{field}: '{old_value}' → '{new_value}'"
+                            )
 
-                updated_obligations += 1
+                            setattr(
+                                obligation,
+                                field,
+                                new_value
+                            )
 
-                CustomerLog.objects.create(
-                    customer=customer,
-                    action=(
-                        CustomerLog.Action
-                        .OBLIGATION_UPDATED
-                    ),
-                    description=(
-                        f"Se actualizó la obligación "
-                        f"{obligation.num_obligacion}."
-                    ),
-                )
+                    if changes:
 
-    return {
-        "created_customers": created_customers,
-        "updated_customers": updated_customers,
-        "created_obligations": created_obligations,
-        "updated_obligations": updated_obligations,
-    }
+                        obligation.save()
+
+                        updated_obligations += 1
+
+                        CustomerLog.objects.create(
+                            customer=customer,
+                            action=CustomerLog.Action.OBLIGATION_UPDATED,
+                            description=(
+                                f"Se actualizó la obligación "
+                                f"{obligation.num_obligacion}.\n"
+                                + "\n".join(changes)
+                            ),
+                        )
+
+        detail = {}
+
+        if created_customers:
+            detail["Asociados creados"] = created_customers
+
+        if updated_customers:
+            detail["Asociados actualizados"] = updated_customers
+
+        if created_obligations:
+            detail["Obligaciones creadas"] = created_obligations
+
+        if updated_obligations:
+            detail["Obligaciones actualizadas"] = updated_obligations
+
+        if not detail:
+            detail["Resultado"] = "No se registró ningún cambio."
+        
+        detail_text = "\n".join(
+            f"{key}: {value}"
+            for key, value in detail.items()
+        )
+        
+        import_execution.mark_success(detail_text)
+
+    except Exception as e:
+        
+        import_execution.mark_failed(f"Se presento un fallo: {e}")

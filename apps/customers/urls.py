@@ -2,7 +2,8 @@ from django.urls import path
 from .views import (
   CustomerListView,
   CustomerDetail,
-  ImportObligationsView
+  ImportObligationsView,
+  ImportCustomersView,
 )
 
 
@@ -13,5 +14,10 @@ urlpatterns = [
         "importar-obligaciones/",
         ImportObligationsView.as_view(),
         name="import_obligations",
+    ),
+    path(
+        "importar-asociados/",
+        ImportCustomersView.as_view(),
+        name="import_customers",
     ),
 ]

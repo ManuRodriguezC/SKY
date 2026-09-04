@@ -432,7 +432,6 @@ def execute_automation_now(request, id):
     return redirect("automations")
 
 def test_automation(request, id):
-    import traceback
     from apps.automations.services.email_connection import get_email_connection
     
     automation = get_object_or_404(Automation,id=id)

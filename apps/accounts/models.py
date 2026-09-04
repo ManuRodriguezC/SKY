@@ -30,6 +30,7 @@ class VerificationStatus:
     EXPIRED = "expired"
     NOT_FOUND = "not_found"
 
+
 class VerificationToken(models.Model):
     user = models.ForeignKey(
         CustomUser,
